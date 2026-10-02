@@ -82,41 +82,17 @@ If you are new to SAP Ariba, follow this order:
   Guide                                                                                                                     Focus                   Best for
   ------------------------------------------------------------------------------------------------------------------------- ----------------------- -----------------------
 
-  📐 [Architecture Complete Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-Architecture-Complete-Guide.md) | SAP Ariba architecture, SAP Business Network, Managed Gateway / CIG, Cloud Connector, ECC / S/4HANA, integration layers, data flows, and troubleshooting by layer | Architecture / Integration / Support |
-  
-  📘 [S2C Complete Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-S2C-Complete-Guide.md)   Source-to-Contract,     Functional / S2C
-                                                                                                                            SLP, sourcing,          learners
-                                                                                                                            RFI/RFP/RFQ, auctions,  
-                                                                                                                            awards                  
-
-  📗 [P2O Complete Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-P2O-Complete-Guide.md)   Procurement execution,  P2O / P2P / functional
-                                                                                                                            Buying, Guided Buying,  / support
-                                                                                                                            catalogs, PR, PO,       
-                                                                                                                            receiving, invoicing    
-
-  🔌 [PnI Complete Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-PnI-Complete-Guide.md)   CIG / Managed Gateway,  Integration / technical
-                                                                                                                            Cloud Connector,        / support
-                                                                                                                            cXML/XML, APIs,         
-                                                                                                                            payloads, ECC,          
-                                                                                                                            monitoring, errors      
-
-  🌐 [Business Network Complete                                                                                             Buyer-supplier          Network / supplier
-  Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-Business-Network-Complete-Guide.md)       collaboration, PO,      collaboration
-                                                                                                                            confirmation, ASN,      
-                                                                                                                            receipt, invoice,       
-                                                                                                                            routing, supplier       
-                                                                                                                            connectivity            
-
-  🎯 [100 SAP Ariba Interview                                                                                               Conceptual, functional, Interview preparation
-  Questions](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-100-Interview-Questions-Answers.md)   technical and scenario  
-                                                                                                                            questions               
-
-  🧪 [P2P Simulator](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/P2P%20Simulator%20.md)                  Educational P2P         Hands-on practice
-                                                                                                                            simulation/lab concept  
-
-| 🛠️ [ECC T-Codes Quick Reference](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-ECC-TCodes.md) | ECC transaction codes for logs, IDocs, web services, jobs, errors, troubleshooting, and support | Integration / Production Support |
-
-  📄 [License](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/LICENSE)                                      Repository licensing    Reuse / contribution
+  | Guide | Focus | Best for |
+|---|---|---|
+| 📐 [01 — Architecture](./01-Architecture.md) | SAP Ariba architecture, SAP Business Network, Managed Gateway / CIG, Cloud Connector, ECC / S/4HANA, integration layers, data flows, and troubleshooting by layer | Architecture / Integration / Support |
+| 📘 [02 — S2C: Source-to-Contract](./02-S2C-Source-to-Contract.md) | Source-to-Contract, SLP, sourcing, RFI/RFP/RFQ, auctions, evaluation, awards, contracts | Functional / S2C learners |
+| 📗 [03 — P2O: Procure-to-Order](./03-P2O-Procure-to-Order.md) | Procurement execution, Buying, Guided Buying, catalogs, PR, approvals, PO, receiving, invoicing, reconciliation | P2O / P2P / Functional / Support |
+| 🌐 [04 — Business Network](./04-Business-Network.md) | Buyer-supplier collaboration, PO, confirmation, ASN, receipt, invoice, routing, supplier connectivity | Network / Supplier collaboration |
+| 🔌 [05 — PnI: Integration](./05-PnI-Integration.md) | Managed Gateway / CIG, Cloud Connector, cXML/XML, APIs, payloads, ECC, monitoring, errors | Integration / Technical / Support |
+| 🛠️ [06 — ECC T-Codes](./06-ECC-TCodes.md) | ECC transaction codes for logs, IDocs, web services, jobs, errors, troubleshooting, and support | Integration / Production Support |
+| 🎯 [07 — Interview Questions](./07-SAP-Ariba-100-Interview-Questions-Answers.md) | Conceptual, functional, technical, and scenario-based questions | Interview preparation |
+| 🧪 [08 — P2P Simulator](./08-P2P-Simulator.md) | Educational P2P simulation / lab design and implementation plan | Hands-on practice |
+| 📄 [License](./LICENSE) | Repository licensing | Reuse / contribution |
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -1013,6 +989,8 @@ P2O
  ↓
 Business Network
  ↓
+Architecture
+ ↓
 PnI
  ↓
 Managed Gateway / CIG
@@ -1086,18 +1064,19 @@ Interview Questions
 
 The repository currently contains the following core artifacts:
 
-``` text
+```text
 SAP-Ariba-Complete-Guide/
 │
 ├── README.md
 │
-├── SAP-Ariba-S2C-Complete-Guide.md
-├── SAP-Ariba-P2O-Complete-Guide.md
-├── SAP-Ariba-PnI-Complete-Guide.md
-├── SAP-Ariba-Business-Network-Complete-Guide.md
-│
-├── SAP-Ariba-100-Interview-Questions-Answers.md
-├── P2P Simulator .md
+├── 01-Architecture.md
+├── 02-S2C-Source-to-Contract.md
+├── 03-P2O-Procure-to-Order.md
+├── 04-Business-Network.md
+├── 05-PnI-Integration.md
+├── 06-ECC-TCodes.md
+├── 07-SAP-Ariba-100-Interview-Questions-Answers.md
+├── 08-P2P-Simulator.md
 │
 └── LICENSE
 ```
@@ -1105,30 +1084,30 @@ SAP-Ariba-Complete-Guide/
 ## Core documentation relationship
 
 ``` text
-                         README
+                                      README
                            │
-          ┌────────────────┼────────────────┐
-          │                │                │
-          ▼                ▼                ▼
-         S2C              P2O              PnI
-          │                │                │
-          │                ▼                │
-          │        Procurement Flow         │
-          │                │                │
-          └────────────┬───┴───────┬────────┘
-                       │           │
-                       ▼           ▼
-                Business Network  ECC
-                       │           │
-                       └─────┬─────┘
-                             ▼
-                    Transactions / Data
-                             │
-                             ▼
-                      Troubleshooting
-                             │
-                             ▼
-                      Interview Prep
+             ┌─────────────┼─────────────┐
+             │             │             │
+             ▼             ▼             ▼
+       Architecture       S2C           P2O
+             │             │             │
+             │             └──────┬──────┘
+             │                    │
+             ▼                    ▼
+           PnI              Business Network
+             │                    │
+             └──────────┬─────────┘
+                        ▼
+                 ECC / Integration
+                        │
+                        ▼
+               Troubleshooting
+                        │
+                        ▼
+              Interview Preparation
+                        │
+                        ▼
+                  P2P Simulator
 ```
 
 The repository can later be reorganized into numbered folders as the
@@ -1301,24 +1280,11 @@ Future lab concepts can include:
 
 # 🧱 Future Roadmap
 
-The current four guides form the core foundation.
+The current numbered guides form the core documentation foundation.
 
-Future repository expansion can include:
-
-``` text
-01-SAP-Ariba-Fundamentals/
-02-P2O/
-03-S2C/
-04-Business-Network/
-05-PnI/
-06-Supplier-Management/
-07-Contracts/
-08-Implementation/
-09-Support-and-Troubleshooting/
-10-Interview-Preparation/
-11-Labs/
-12-Architecture/
-```
+Future repository expansion can include additional practical artifacts
+and topic-specific documentation without changing the current core guide
+structure.
 
 Potential future artifacts:
 
