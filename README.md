@@ -1575,7 +1575,20 @@ That is the core philosophy of this repository.
 
 This repository uses **Creative Commons Attribution 4.0 International (CC BY 4.0)** for the original documentation content, subject to the terms described in the repository's [LICENSE](./LICENSE).
 
-SAP product names, trademarks, documentation, and third-party materials remain the property of their respective owners.
+**Copyright © 2026 Prateek Satpathi.** Unless otherwise stated, the original explanations, structure, examples, diagrams, troubleshooting scenarios, and other original documentation in this repository were created by the repository author.
+
+This is an **independent educational and reference project**. It is not official SAP documentation and is not affiliated with, sponsored by, or endorsed by SAP SE.
+
+SAP, SAP Ariba, SAP Business Network, SAP S/4HANA, SAP ECC, and other SAP product names, trademarks, logos, documentation, and related intellectual property remain the property of SAP SE or their respective owners.
+
+Third-party materials referenced, linked, quoted, or reproduced in this repository remain subject to their respective copyright, trademark, license, and usage terms.
+
+Technical information is provided for educational and informational purposes. Reasonable effort is made to maintain accuracy, but SAP products, features, interfaces, configurations, and supported integration patterns may change over time. Always validate technical procedures against applicable official documentation and the specific system environment before applying them in production.
+
+If you reuse or adapt substantial portions of the original content, please provide attribution to:
+
+**Prateek Satpathi — SAP Ariba Complete Guide**
+https://github.com/Ram-2200/SAP-Ariba-Complete-Guide
 
 ---
 
