@@ -1,5 +1,18 @@
 # SAP MM — Detailed Practical Guide
 
+
+## Document Navigation
+
+- [SAP MM in the SAP landscape](#3-where-sap-mm-fits-in-sap)
+- [SAP MM organizational hierarchy](#5-sap-mm-organizational-hierarchy)
+- [SAP MM procurement and P2P](#19-purchase-requisition)
+- [SAP Ariba and SAP MM relationship](#36-sap-ariba-and-sap-mm)
+- [Ariba P2O vs SAP MM P2P](#62-ariba-p2o-vs-sap-mm-procurement--p2p)
+- [Troubleshooting](#43-example-ariba-p2o-support-engineer)
+- [Official SAP references](#75-official-sap-references)
+- [Mental model](#76-mental-model)
+
+
 > **File:** `07-SAP-MM.md`  
 > **Purpose:** A practical SAP Materials Management (MM) guide for SAP Ariba professionals, P2P consultants, integration/support engineers, and interview preparation.
 >
@@ -44,7 +57,9 @@ Financial Posting / Payment Process
 ```
 
 SAP MM is therefore a major ERP-side foundation for the **Procure-to-Pay (P2P)** process.
-
+>SAP MM is not a separate external system from ECC/S/4HANA. In this guide,
+"SAP MM" refers to the Materials Management functionality/process area
+running within the SAP ERP/S/4HANA environment.
 ---
 
 # 2. SAP MM in Simple Words
@@ -97,25 +112,37 @@ A simplified SAP landscape is:
 For an Ariba environment:
 
 ```text
-        SAP Ariba
-            |
-            | Integration
-            ↓
- Business Network / Managed Gateway
-            |
-            ↓
-     SAP Integration Layer
-            |
-            ↓
-      SAP ECC / S/4HANA
-            |
-            ↓
-          SAP MM
-            |
-      ----------------
-      |       |      |
-      PR      PO     GR/IR
+                    SAP Ariba
+                        |
+                        ↓
+              SAP Business Network
+                        |
+                        ↓
+      SAP Integration Suite, Managed Gateway
+                        |
+                        ↓
+                SAP ECC / S/4HANA
+                        |
+                  +-----+-----+
+                  |   SAP MM  |
+                  |           |
+                  | Purchasing|
+                  | Inventory |
+                  | Goods     |
+                  | Movement  |
+                  | Invoice   |
+                  | Verification
+                  +-----+-----+
+                        |
+                 SAP ERP Documents
+                 /       |       \
+               PR        PO      GR / IR
 ```
+
+> **Architecture note:** SAP MM is functionality within the SAP ERP / SAP S/4HANA
+> backend; it is not a separate system underneath ECC or S/4HANA. The exact
+> integration path varies by customer architecture, SAP product, ERP release,
+> and configuration.
 
 The exact architecture depends on the customer's SAP Ariba products, ERP release, integration approach, and configuration.
 
@@ -198,6 +225,8 @@ Understanding organizational structure is extremely important for both SAP MM an
 A simplified structure:
 
 ```text
+Enterprise / Logistics Structure
+
 Client
   |
   +-- Company Code
@@ -206,12 +235,21 @@ Client
               |
               +-- Storage Location
 
-Purchasing Structure:
+
+Purchasing Structure / Responsibilities
 
 Purchasing Organization
         |
-        +-- Purchasing Group
+        +-- Purchasing responsibility / scope
+
+Purchasing Group
+        |
+        +-- Buyer / purchasing responsibility
 ```
+
+> **Important:** Purchasing Group is not a structural child of Purchasing
+> Organization in the same hierarchical sense that Storage Location belongs
+> under Plant. They are related purchasing responsibility concepts.
 
 These objects have different purposes.
 
@@ -1050,7 +1088,7 @@ Both can participate in procurement processes involving:
 - Procurement data
 - Supplier/material information
 
-Both can therefore appear in the same P2P landscape.
+Depending on the customer architecture, both can therefore participate in the same end-to-end P2P landscape.
 
 ---
 
@@ -1073,14 +1111,18 @@ A simplified enterprise architecture can look like:
                      ↓
               SAP ECC / S/4HANA
                      |
-                     ↓
-                 SAP MM
-                     |
-          -----------------------
-          |          |          |
-       Inventory   Goods      Accounting
-                  Movement
+              +------+------+
+              |             |
+            SAP MM        SAP FI
+              |             |
+        Purchasing       Accounting
+        Inventory
+        Goods Movement
+        Invoice Verification
 ```
+
+> This is a conceptual model, not a universal customer architecture. SAP MM
+> and SAP FI represent functional areas within the ERP / S/4HANA landscape.
 
 Do not interpret this as saying every Ariba customer uses this exact architecture. It is a conceptual model.
 
@@ -1141,19 +1183,23 @@ A user creates a shopping cart in Ariba.
 User
  ↓
 Ariba Shopping Cart
- ↓
+        ↓
 Approval
- ↓
-PR / procurement document
- ↓
-Integration
- ↓
+        ↓
+Ariba procurement document
+        ↓
+Configured integration
+        ↓
 S/4HANA
- ↓
-Purchasing / PO
+        ↓
+ERP purchasing processing
+        ↓
+Purchase Order
  ↓
 Supplier
 ```
+> The exact ERP document created, or whether a PR is created in the
+> backend, depends on the configured Ariba-to-ERP integration scenario.
 
 Supplier collaboration can occur through Business Network.
 
@@ -1759,7 +1805,7 @@ Questions:
 
 ---
 
-# 62. Ariba P2O vs SAP MM P2P
+# 62. Ariba P2O vs SAP MM Procurement / P2P
 
 ## Ariba P2O
 
@@ -2270,20 +2316,71 @@ SAP Ariba
     ↓
 Procurement / Sourcing / Supplier Collaboration
     ↓
-Business Network
+SAP Business Network
     ↓
-Integration Layer
+Integration Layer / Managed Gateway
     ↓
-SAP ECC / S4HANA
-    ↓
-SAP MM
-    ↓
-PO / GR / Inventory / Invoice Verification
+SAP ECC / S/4HANA
+    |
+    +-- SAP MM
+    |     +-- Purchasing
+    |     +-- Inventory
+    |     +-- Goods Movement
+    |     +-- Invoice Verification
+    |
+    +-- SAP FI
+          +-- Accounting / Financial Posting
 ```
 
 ---
 
-# 75. Mental Model
+# 75. Official SAP References
+
+Use current SAP documentation to validate release-specific behavior,
+configuration, transactions, supported integration scenarios, and differences
+between SAP ERP / ECC and SAP S/4HANA.
+
+## SAP Core Documentation
+
+- **SAP Help Portal:** https://help.sap.com/
+- **SAP S/4HANA — Sourcing and Procurement:** https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/af9ef57f504840d2b81be8667206d485/003174573d144755b4899fad743c45aa-1358.html
+- **SAP Fiori Apps Reference Library:** https://fioriappslibrary.hana.ondemand.com/
+- **SAP Learning:** https://learning.sap.com/
+
+## SAP Ariba / Integration Documentation
+
+- **Managed Gateway — Overview:** https://help.sap.com/docs/sisgw/sap-ariba-cloud-integration-gateway-overview-guide/introduction
+- **Managed Gateway — Installation Guide:** https://help.sap.com/docs/sisgw/sap-ariba-cloud-integration-gateway-overview-guide/342bcc5ee21b48fa94a0e83c4b030a57.html
+- **Managed Gateway — Configuration Guide:** https://help.sap.com/docs/sisgw/sap-ariba-cloud-integration-gateway-configuration-guide
+- **Managed Gateway — Supported Systems:** https://help.sap.com/docs/sisgw/sap-ariba-cloud-integration-gateway-migration-guide/supported-systems
+- **SAP Integration Suite, Managed Gateway product page:** https://www.sap.com/products/technology-platform/integration-suite/capabilities/managed-gateway.html
+
+## How to Use These References
+
+When troubleshooting or preparing for an interview:
+
+1. Start with the **business process**.
+2. Identify the **SAP document** involved.
+3. Identify the relevant **organizational object**.
+4. Check the relevant **master data**.
+5. Identify the **integration boundary**, if Ariba is involved.
+6. Verify behavior against documentation for the customer's **SAP release and configuration**.
+7. Use transaction/app-specific documentation when discussing a particular SAP GUI transaction or Fiori app.
+
+> **Terminology note:** SAP Ariba Cloud Integration Gateway (CIG) is the former/common
+> name you may still encounter in projects, older documentation, tickets, and
+> interview discussions. Current SAP documentation uses the **SAP Integration Suite,
+> managed gateway for spend management and SAP Business Network** terminology.
+
+> **Important:** Screens, fields, transactions, APIs, integration scenarios,
+> supported releases, configuration steps, and document mappings can change by
+> SAP release and customer implementation. Treat this guide as a conceptual and
+> interview/support reference, not as a substitute for release-specific SAP Help
+> documentation.
+
+---
+
+# 76. Mental Model
 
 If you remember only one thing:
 
@@ -2334,7 +2431,7 @@ Accounting / Payment
 
 ---
 
-# 76. Practical Checklist for an Ariba Consultant
+# 77. Practical Checklist for an Ariba Consultant
 
 Before saying you understand SAP MM, make sure you can explain:
 
@@ -2371,7 +2468,7 @@ Before saying you understand SAP MM, make sure you can explain:
 
 ---
 
-# 77. Final Takeaway
+# 78. Final Takeaway
 
 SAP MM should not be learned as a collection of T-codes.
 
