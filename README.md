@@ -1254,7 +1254,7 @@ Root cause
 
 # 🧪 P2P Simulator
 
-The repository also contains a planned/educational **P2P Simulator**.
+The repository also contains an educational **P2P Simulator design and implementation plan**.
 
 Its purpose is to turn concepts into practical exercises:
 
