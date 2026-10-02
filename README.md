@@ -32,6 +32,8 @@ Platform & Integration
       ↓
 SAP ECC / S/4HANA
       ↓
+SAP MM / ERP Processing
+      ↓
 Master Data + Transaction Data
       ↓
 Monitoring + Troubleshooting
@@ -68,12 +70,14 @@ If you are new to SAP Ariba, follow this order:
 5. Learn Business Network
           ↓
 6. Learn PnI / Integration
-          ↓
-7. Practice transaction flows
-          ↓
-8. Study troubleshooting
-          ↓
-9. Prepare for interviews
+        ↓
+7. Understand SAP MM / ERP processing
+        ↓
+8. Practice transaction flows
+        ↓
+9. Study troubleshooting
+        ↓
+10. Prepare for interviews
 ```
 
 ### Core guides currently available
@@ -82,44 +86,51 @@ If you are new to SAP Ariba, follow this order:
   Guide                                                                                                                     Focus                   Best for
   ------------------------------------------------------------------------------------------------------------------------- ----------------------- -----------------------
 
-  | Guide | Focus | Best for |
+| Guide | Focus | Best for |
 |---|---|---|
 | 📐 [01 — Architecture](./01-Architecture.md) | SAP Ariba architecture, SAP Business Network, Managed Gateway / CIG, Cloud Connector, ECC / S/4HANA, integration layers, data flows, and troubleshooting by layer | Architecture / Integration / Support |
-| 📘 [02 — S2C: Source-to-Contract](./02-S2C-Source-to-Contract.md) | Source-to-Contract, SLP, sourcing, RFI/RFP/RFQ, auctions, evaluation, awards, contracts | Functional / S2C learners |
-| 📗 [03 — P2O: Procure-to-Order](./03-P2O-Procure-to-Order.md) | Procurement execution, Buying, Guided Buying, catalogs, PR, approvals, PO, receiving, invoicing, reconciliation | P2O / P2P / Functional / Support |
-| 🌐 [04 — Business Network](./04-Business-Network.md) | Buyer-supplier collaboration, PO, confirmation, ASN, receipt, invoice, routing, supplier connectivity | Network / Supplier collaboration |
-| 🔌 [05 — PnI: Integration](./05-PnI-Integration.md) | Managed Gateway / CIG, Cloud Connector, cXML/XML, APIs, payloads, ECC, monitoring, errors | Integration / Technical / Support |
-| 🛠️ [06 — ECC T-Codes](./06-ECC-TCodes.md) | ECC transaction codes for logs, IDocs, web services, jobs, errors, troubleshooting, and support | Integration / Production Support |
-| 🎯 [07 — Interview Questions](./07-SAP-Ariba-100-Interview-Questions-Answers.md) | Conceptual, functional, technical, and scenario-based questions | Interview preparation |
-| 🧪 [08 — P2P Simulator](./08-P2P-Simulator.md) | Educational P2P simulation / lab design and implementation plan | Hands-on practice |
-| 📄 [License](./LICENSE) | Repository licensing | Reuse / contribution |
+| 📘 [02 — S2C: Source-to-Contract](./02-S2C-Source-to-Contract.md) | Source-to-Contract, SLP, supplier lifecycle, sourcing, RFI/RFP/RFQ, auctions, evaluation, awards, contracts | Functional / S2C learners |
+| 📗 [03 — P2O: Procure-to-Order](./03-P2O-Procure-to-Order.md) | Procurement execution, Buying, Guided Buying, catalogs, PR, approvals, PO, receiving, invoicing, and reconciliation | P2O / P2P / Functional / Support |
+| 🌐 [04 — Business Network](./04-Business-Network.md) | Buyer-supplier collaboration, PO, confirmation, ASN, receipt, invoice, routing, supplier connectivity | Network / Supplier Collaboration |
+| 🔌 [05 — PnI: Integration](./05-PnI-Integration.md) | Managed Gateway / CIG, Cloud Connector, cXML/XML, APIs, payloads, ECC, monitoring, errors, and troubleshooting | Integration / Technical / Support |
+| 🛠️ [06 — ECC T-Codes](./06-ECC-TCodes.md) | ECC/S/4HANA transaction codes for logs, IDocs, web services, jobs, errors, and troubleshooting | Integration / Production Support |
+| 🏭 [07 — SAP MM](./07-SAP-MM.md) | SAP MM fundamentals, organizational structure, procurement, inventory, invoice verification, T-Codes, and Ariba/MM integration | Ariba / P2P / ERP learners |
+| 🎯 [08 — SAP Ariba Interview Questions](./08-SAP-Ariba-100-Interview-Questions-Answers.md) | 100 conceptual, functional, technical, integration, support, consulting, and scenario-based questions | Interview preparation |
+| 📄 [License](./LICENSE) | Repository licensing | Reuse / contribution
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
 # 🧭 The SAP Ariba Mental Model
 
-A useful way to understand the ecosystem is to separate it into **four
-major pillars**.
+A useful way to understand the SAP Ariba ecosystem is to separate it
+into **four core Ariba areas**, supported by the SAP ERP/MM layer.
 
 ``` text
-                    SAP ARIBA ECOSYSTEM
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-        ▼                  ▼                  ▼
-      S2C                 P2O                PnI
- Source-to-Contract   Procure-to-Order   Platform & Integration
-        │                  │                  │
-        │                  │                  │
-        └──────────────────┼──────────────────┘
-                           │
-                           ▼
-                 SAP BUSINESS NETWORK
-                           │
-                           ▼
-                      SUPPLIERS
+                          SAP ARIBA ECOSYSTEM
+                                  │
+              ┌───────────────────┼───────────────────┐
+              │                   │                   │
+              ▼                   ▼                   ▼
+             S2C                 P2O                 PnI
+      Source-to-Contract   Procure-to-Order   Platform & Integration
+              │                   │                   │
+              └───────────────────┼───────────────────┘
+                                  │
+                                  ▼
+                         SAP BUSINESS NETWORK
+                                  │
+                                  ▼
+                              SUPPLIERS
+                                  │
+                                  ▼
+                         SAP ECC / S/4HANA
+                                  │
+                                  ▼
+                               SAP MM
 ```
+> **SAP MM is shown as the ERP procurement layer rather than as an
+> Ariba application pillar.**
 
 ## 1. S2C --- Source-to-Contract
 
@@ -174,7 +185,11 @@ Major areas:
 -   Invoice
 -   Invoice reconciliation
 -   Exceptions
-
+  
+> **Terminology:** In this repository, **P2O (Procure-to-Order)** is used
+> for the Ariba procurement execution layer, while **P2P (Procure-to-Pay)**
+> refers to the broader end-to-end lifecycle including receiving,
+> invoicing, reconciliation, and payment.
 ------------------------------------------------------------------------
 
 ## 3. PnI --- Platform & Integration
@@ -584,6 +599,9 @@ that every implementation uses every document.
   What did the supplier bill?                  Invoice
   Does the invoice match?                      Reconciliation
   How does the message move between systems?   PnI
+  What executes procurement in the ERP?        SAP MM / ERP
+  Where are goods movements recorded?          SAP MM
+  Where is invoice verification performed?     SAP MM / ERP
   Why did the transaction fail?                Troubleshooting
   How do we implement the solution?            Implementation
   How do we support it in production?          Support
@@ -943,13 +961,19 @@ the repository.
 ``` text
 SAP Ariba Fundamentals
         ↓
+Architecture
+        ↓
 P2O
         ↓
 Business Network
         ↓
+SAP MM / ERP Fundamentals
+        ↓
 S2C
         ↓
-PnI basics
+PnI Basics
+        ↓
+ECC / T-Codes
         ↓
 Interview Questions
 ```
@@ -971,14 +995,17 @@ Invoicing
  ↓
 Business Network
  ↓
+SAP MM Fundamentals
+ ↓
 S2C
  ↓
 Supplier Management
  ↓
 Contracts
  ↓
-Integration concepts
+Integration Concepts
  ↓
+Implementation
 Implementation
 ```
 
@@ -1001,7 +1028,9 @@ APIs
  ↓
 Cloud Connector
  ↓
-ECC
+ECC / S4HANA
+ ↓
+SAP MM / ERP Processing
  ↓
 Payload Analysis
  ↓
@@ -1075,8 +1104,8 @@ SAP-Ariba-Complete-Guide/
 ├── 04-Business-Network.md
 ├── 05-PnI-Integration.md
 ├── 06-ECC-TCodes.md
-├── 07-SAP-Ariba-100-Interview-Questions-Answers.md
-├── 08-P2P-Simulator.md
+├── 07-SAP-MM.md
+├── 08-SAP-Ariba-100-Interview-Questions-Answers.md
 │
 └── LICENSE
 ```
@@ -1085,29 +1114,29 @@ SAP-Ariba-Complete-Guide/
 
 ``` text
                                       README
-                           │
-             ┌─────────────┼─────────────┐
-             │             │             │
-             ▼             ▼             ▼
-       Architecture       S2C           P2O
-             │             │             │
-             │             └──────┬──────┘
-             │                    │
-             ▼                    ▼
-           PnI              Business Network
-             │                    │
-             └──────────┬─────────┘
-                        ▼
-                 ECC / Integration
-                        │
-                        ▼
-               Troubleshooting
-                        │
-                        ▼
-              Interview Preparation
-                        │
-                        ▼
-                  P2P Simulator
+                                         │
+              ┌──────────────────────────┼──────────────────────────┐
+              │                          │                          │
+              ▼                          ▼                          ▼
+        Architecture                    S2C                        P2O
+              │                          │                          │
+              │                          └──────────┬───────────────┘
+              │                                     │
+              ▼                                     ▼
+             PnI                             Business Network
+              │                                     │
+              └──────────────────┬──────────────────┘
+                                 ▼
+                         ECC / S/4HANA
+                                 │
+                                 ▼
+                              SAP MM
+                                 │
+                                 ▼
+                         Troubleshooting
+                                 │
+                                 ▼
+                       Interview Preparation
 ```
 
 The repository can later be reorganized into numbered folders as the
@@ -1238,46 +1267,6 @@ Root cause
 
 ------------------------------------------------------------------------
 
-# 🧪 P2P Simulator
-
-The repository also contains an educational **P2P Simulator design and implementation plan**.
-
-Its purpose is to turn concepts into practical exercises:
-
-``` text
-Create PR
-   ↓
-Approval
-   ↓
-PO
-   ↓
-Supplier
-   ↓
-Receipt
-   ↓
-Invoice
-   ↓
-Reconciliation
-```
-
-The simulator should use **simplified educational rules**, not claim to
-reproduce every SAP Ariba configuration or tolerance behavior.
-
-Future lab concepts can include:
-
--   PR creation
--   Approval
--   PO generation
--   Supplier assignment
--   Goods receipt
--   Invoice
--   2-way/3-way matching concepts
--   Exceptions
--   Reprocessing
--   Transaction logs
-
-------------------------------------------------------------------------
-
 # 🧱 Future Roadmap
 
 The current numbered guides form the core documentation foundation.
@@ -1300,7 +1289,6 @@ Potential future artifacts:
 -   Cutover checklist
 -   Hypercare checklist
 -   Scenario-based interview sets
--   Python P2P simulator
 -   Sample sanitized payloads
 
 These are **roadmap items**, not claims that all of these folders/files
@@ -1441,6 +1429,12 @@ behavior and configuration.
 -   [SAP Cloud
     Connector](https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/cloud-connector)
 -   [SAP Integration Suite](https://help.sap.com/docs/integration-suite)
+
+## SAP ERP / Materials Management
+
+- [SAP S/4HANA documentation](https://help.sap.com/)
+- [SAP Materials Management documentation](https://help.sap.com/)
+- [SAP Procurement documentation](https://help.sap.com/)  
 
 ## cXML
 
