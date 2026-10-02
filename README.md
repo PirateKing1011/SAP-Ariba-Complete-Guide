@@ -59,19 +59,21 @@ If you are new to SAP Ariba, follow this order:
 ``` text
 1. Understand the ecosystem
           ↓
-2. Learn S2C
+2. Understand the architecture
           ↓
-3. Learn P2O
+3. Learn S2C
           ↓
-4. Learn Business Network
+4. Learn P2O
           ↓
-5. Learn PnI / Integration
+5. Learn Business Network
           ↓
-6. Practice transaction flows
+6. Learn PnI / Integration
           ↓
-7. Study troubleshooting
+7. Practice transaction flows
           ↓
-8. Prepare for interviews
+8. Study troubleshooting
+          ↓
+9. Prepare for interviews
 ```
 
 ### Core guides currently available
@@ -79,6 +81,9 @@ If you are new to SAP Ariba, follow this order:
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   Guide                                                                                                                     Focus                   Best for
   ------------------------------------------------------------------------------------------------------------------------- ----------------------- -----------------------
+
+  📐 [Architecture Complete Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-Architecture-Complete-Guide.md) | SAP Ariba architecture, SAP Business Network, Managed Gateway / CIG, Cloud Connector, ECC / S/4HANA, integration layers, data flows, and troubleshooting by layer | Architecture / Integration / Support |
+  
   📘 [S2C Complete Guide](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-S2C-Complete-Guide.md)   Source-to-Contract,     Functional / S2C
                                                                                                                             SLP, sourcing,          learners
                                                                                                                             RFI/RFP/RFQ, auctions,  
@@ -108,6 +113,8 @@ If you are new to SAP Ariba, follow this order:
 
   🧪 [P2P Simulator](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/P2P%20Simulator%20.md)                  Educational P2P         Hands-on practice
                                                                                                                             simulation/lab concept  
+
+| 🛠️ [ECC T-Codes Quick Reference](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/SAP-Ariba-ECC-TCodes.md) | ECC transaction codes for logs, IDocs, web services, jobs, errors, troubleshooting, and support | Integration / Production Support |
 
   📄 [License](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide/blob/main/LICENSE)                                      Repository licensing    Reuse / contribution
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
