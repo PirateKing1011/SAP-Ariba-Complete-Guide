@@ -271,7 +271,7 @@ The integration method depends on the customer's architecture and supported scen
 | Add-on-based integration | Supported scenarios | Supported scenarios |
 | API-based integration | Scenario dependent | Important option |
 
-SAP documents both **add-on-based** and **API-based** integration methods for SAP ERP/S/4HANA scenarios. citeturn0search14
+SAP documents both **add-on-based** and **API-based** integration methods for SAP ERP/S/4HANA scenarios.
 
 ---
 
@@ -295,7 +295,7 @@ Managed Gateway Add-On
 ERP Business Processing
 ```
 
-SAP documents Managed Gateway add-ons for SAP ERP and SAP S/4HANA in add-on-based scenarios. citeturn0search14
+SAP documents Managed Gateway add-ons for SAP ERP and SAP S/4HANA in add-on-based scenarios.
 
 ---
 
@@ -315,8 +315,7 @@ SAP S/4HANA
 Business Object / Application
 ```
 
-SAP identifies API-based integration using SAP S/4HANA APIs as one supported integration approach, with hybrid scenarios possible in certain architectures. citeturn0search14
-
+SAP identifies API-based integration using SAP S/4HANA APIs as one supported integration approach, with hybrid scenarios possible in certain architectures. 
 Therefore:
 
 > **Do not assume every Ariba → S/4HANA transaction must be an IDoc.**
