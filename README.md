@@ -6,6 +6,41 @@
 [![Documentation](https://img.shields.io/badge/Documentation-Complete%20Guide-blue)](https://github.com/Ram-2200/SAP-Ariba-Complete-Guide)
 [![License](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
 
+> **Status:** Active learning and reference project  
+> **Focus:** SAP Ariba • P2O • S2C • Business Network • Integration • SAP MM • Production Support • Interview Preparation
+---
+## 👥 Who Should Use This Repository?
+
+This repository is designed for different SAP Ariba learning and career paths.  
+Use the path below based on your current role or goal.
+
+| If you are... | Start with... |
+|---|---|
+| 🧑‍🎓 **New to SAP Ariba** | Architecture → S2C → P2O |
+| 🧩 **SAP Ariba Functional Consultant** | S2C → P2O → Business Network |
+| 🔗 **Integration Engineer** | Architecture → PnI → ECC T-Codes |
+| 🛠️ **Production Support Engineer** | PnI → ECC T-Codes → Production Support |
+| 📦 **SAP MM Professional** | SAP MM → P2O → Integration |
+| 🎯 **Preparing for SAP Ariba Interviews** | Interview Questions → Production Support Scenarios |
+| 🚀 **Moving from Support to Consulting** | P2O → PnI → SAP MM → Production Support Scenarios |
+
+### Recommended Starting Points
+
+- **Want to understand SAP Ariba from scratch?**  
+  Start with `01-Architecture.md`, then move through S2C and P2O.
+
+- **Want to understand integration and troubleshooting?**  
+  Start with `05-PnI-Integration.md`, followed by `06-ECC-TCodes.md` and `09-Production-Support-Scenarios.md`.
+
+- **Want to prepare for interviews?**  
+  Start with `08-SAP-Ariba-Interview-Questions-Answers.md`, then test your practical troubleshooting knowledge with `09-Production-Support-Scenarios.md`.
+
+- **Want to strengthen SAP ERP/MM knowledge?**  
+  Start with `07-SAP-MM.md`, then connect it with P2O and the integration guides.
+
+- **Want to move from support into consulting/implementation?**  
+  Follow the P2O → PnI → SAP MM → Production Support path and use the interview guide for practical revision.
+
 ---
 
 # 📌 What This Repository Is
