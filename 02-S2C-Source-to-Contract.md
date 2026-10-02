@@ -1975,6 +1975,1785 @@ Exception / troubleshooting
 
 ---
 
+
+---
+
+# Detailed S2C Expansion
+
+> The following sections extend the existing guide with deeper implementation, support, testing, and interview material while keeping the original concepts and terminology intact.
+
+## D1. S2C Operating Model
+
+```text
+STRATEGY
+  ↓
+Category / Spend / Requirement
+  ↓
+SUPPLIER LIFECYCLE
+  ↓
+Request → Registration → Qualification → Requalification
+  ↓
+SOURCING
+  ↓
+Request → Project → RFI / RFP / Auction
+  ↓
+RESPONSE
+  ↓
+Validation → Evaluation → Scoring
+  ↓
+DECISION
+  ↓
+Award → Contract
+  ↓
+EXECUTION
+  ↓
+P2O → Business Network → ERP / S4
+```
+
+The important idea is that S2C is a connected business lifecycle, not simply an RFP or auction screen.
+
+---
+
+## D2. Business Requirement Analysis
+
+Before creating a sourcing event, establish:
+
+| Area | Questions |
+|---|---|
+| Requirement | What exactly is being sourced? |
+| Category | Which category/commodity is involved? |
+| Scope | Which locations, departments and quantities? |
+| Timeline | When is the requirement needed? |
+| Supplier market | Which suppliers can realistically provide it? |
+| Commercial model | Unit price, service rate, subscription, milestone, etc.? |
+| Technical requirements | What is mandatory? |
+| Compliance | Which certifications or regulatory conditions matter? |
+| Evaluation | How will responses be compared? |
+| Contract | What terms must survive after award? |
+| Downstream | How will the awarded business be purchased? |
+
+### Example
+
+```text
+5,000 enterprise laptops
+       ↓
+Specifications
+       ↓
+Warranty
+       ↓
+Delivery
+       ↓
+Support
+       ↓
+Supplier eligibility
+       ↓
+Pricing model
+       ↓
+Evaluation model
+       ↓
+Award strategy
+```
+
+Do not begin with the event template and discover the business requirement afterward.
+
+---
+
+## D3. Category Strategy vs Sourcing Event
+
+**Category strategy** answers:
+
+> How should this category be managed?
+
+**Sourcing event** answers:
+
+> How will supplier information or bids be collected for this requirement?
+
+Example:
+
+```text
+Category Strategy
+      ↓
+IT Hardware
+      ↓
+Annual sourcing strategy
+      ↓
+Laptop requirement
+      ↓
+RFI
+      ↓
+RFP
+      ↓
+Auction
+```
+
+A sourcing event is an execution mechanism within a wider procurement strategy.
+
+---
+
+## D4. S2C Business Object Mental Model
+
+Conceptually:
+
+```text
+Category
+   │
+   ├───────────────┐
+   ▼               ▼
+Supplier       Requirement
+   │               │
+   ▼               ▼
+Registration    Sourcing Request
+   │               │
+   ▼               ▼
+Qualification   Sourcing Project
+   │               │
+   └───────┬───────┘
+           ▼
+      Sourcing Event
+      ├── RFI
+      ├── RFP
+      └── Auction
+           │
+           ▼
+      Supplier Response
+           │
+           ▼
+      Evaluation / Scoring
+           │
+           ▼
+          Award
+           │
+           ▼
+        Contract
+           │
+           ▼
+          P2O
+```
+
+This is a conceptual relationship. The exact object model and workflow depend on the customer's solution and configuration.
+
+---
+
+## D5. Supplier Lifecycle — Deeper Diagnostic Model
+
+A supplier issue should first be mapped to its lifecycle stage:
+
+```text
+Supplier Request
+      ↓
+Registration
+      ↓
+Qualification
+      ↓
+Preferred / Lifecycle Management
+      ↓
+Sourcing Eligibility
+      ↓
+Event Participation
+```
+
+### Important distinctions
+
+```text
+Supplier exists
+      ≠
+Supplier is registered
+      ≠
+Supplier is qualified
+      ≠
+Supplier is preferred
+      ≠
+Supplier is eligible for a particular event
+```
+
+These distinctions are especially useful in support interviews.
+
+---
+
+## D6. Registration Evidence Checklist
+
+When a registration does not progress, capture:
+
+```text
+☐ Supplier identity
+☐ Registration status
+☐ Mandatory questionnaire responses
+☐ Validation errors
+☐ Required documents
+☐ Approval status
+☐ Approver information
+☐ Invitation/contact information
+☐ Activity/history
+☐ Timestamp
+```
+
+Then classify the issue:
+
+```text
+Data
+Configuration
+Workflow
+Supplier action
+Access
+Process
+```
+
+Do not immediately assume the platform is defective.
+
+---
+
+## D7. Qualification Evidence Checklist
+
+For a qualification issue, verify:
+
+```text
+Supplier registration
+      ↓
+Qualification status
+      ↓
+Commodity
+      ↓
+Region
+      ↓
+Department
+      ↓
+Qualification currency
+      ↓
+Questionnaire/evidence
+      ↓
+Event eligibility
+```
+
+A supplier may be qualified for one business context while having a different outcome for another.
+
+---
+
+## D8. Sourcing Request vs Project vs Event
+
+| Concept | Main purpose |
+|---|---|
+| Sourcing Request | Initiates or communicates a sourcing requirement |
+| Sourcing Project | Organizes the broader sourcing initiative |
+| Sourcing Event | Collects information or competitive responses |
+
+Conceptual flow:
+
+```text
+Business
+   ↓
+Sourcing Request
+   ↓
+Sourcing Review
+   ↓
+Sourcing Project
+   ├── Tasks
+   ├── Documents
+   ├── RFI
+   ├── RFP
+   ├── Auction
+   └── Award
+```
+
+Exact relationships are configuration-dependent.
+
+---
+
+## D9. Event Design Framework
+
+Before publishing an event, answer five questions:
+
+```text
+1. What information do we need?
+2. From which suppliers?
+3. What makes a response valid?
+4. How will responses be evaluated?
+5. How will the result become an award?
+```
+
+Conceptual event structure:
+
+```text
+Event
+├── Introduction
+├── Prerequisites
+├── General Questions
+├── Technical Requirements
+├── Commercial Requirements
+├── Pricing
+├── Delivery
+├── Compliance
+├── Attachments
+└── Terms / Conditions
+```
+
+---
+
+## D10. Prerequisites vs Questions
+
+### Prerequisite
+
+A prerequisite is primarily an eligibility/access gate.
+
+```text
+Accept agreement
+      ↓
+Complete required prerequisite
+      ↓
+Provide required evidence
+      ↓
+Eligible to participate
+```
+
+### Event question
+
+A question collects information used during the response/evaluation process.
+
+Example:
+
+```text
+Question:
+"What is your standard delivery lead time?"
+
+Response:
+"30 days"
+```
+
+Do not treat every mandatory question as a prerequisite.
+
+---
+
+## D11. RFI Design
+
+The primary purpose of an RFI is to reduce market uncertainty.
+
+Typical sections:
+
+```text
+Company
+Geography
+Capabilities
+Certifications
+Technology
+Service model
+References
+```
+
+Typical output:
+
+```text
+RFI responses
+      ↓
+Capability comparison
+      ↓
+Shortlist
+      ↓
+RFP candidates
+```
+
+An RFI should not automatically be described as a price competition.
+
+---
+
+## D12. RFP Design
+
+A practical RFP may contain:
+
+```text
+Business requirements
+Technical requirements
+Commercial requirements
+Pricing
+Implementation approach
+Delivery
+Support
+SLA
+Warranty
+Risk / compliance
+Attachments
+Contract assumptions
+```
+
+Example evaluation model:
+
+```text
+Commercial   40%
+Technical    25%
+Delivery     15%
+Support      10%
+Risk         10%
+```
+
+The weights are illustrative; actual event configuration varies.
+
+---
+
+## D13. Pricing Models
+
+Pricing does not have to be a single unit price.
+
+### Unit pricing
+
+```text
+Quantity × Unit Price
+```
+
+### Tiered pricing
+
+```text
+1–100       → Rate A
+101–500     → Rate B
+501–1000    → Rate C
+```
+
+### Service rates
+
+```text
+Architect   → Hourly Rate
+Consultant  → Hourly Rate
+Engineer    → Hourly Rate
+```
+
+### Subscription
+
+```text
+Implementation
++
+Recurring fee
++
+Optional services
+```
+
+### Total-cost view
+
+```text
+Purchase
++
+Implementation
++
+Support
++
+Maintenance
++
+Logistics
++
+Other defined costs
+```
+
+The exact calculation depends on event design.
+
+---
+
+## D14. Bid Collection and Validation
+
+A useful diagnostic sequence is:
+
+```text
+Supplier submits
+      ↓
+Completeness
+      ↓
+Required fields
+      ↓
+Prerequisites
+      ↓
+Commercial response
+      ↓
+Technical response
+      ↓
+Attachments
+      ↓
+Eligibility
+      ↓
+Evaluation
+```
+
+Separate:
+
+```text
+Cannot submit
+      ≠
+Submitted but scored poorly
+      ≠
+Submitted but excluded by eligibility
+```
+
+These are different problem classes.
+
+---
+
+## D15. Auction Readiness
+
+Before using an auction, consider:
+
+```text
+Qualified suppliers available?
+Comparable specifications?
+Comparable commercial terms?
+Competitive market?
+Clear pricing model?
+Supplier readiness?
+Business strategy supports auction?
+```
+
+A reverse auction is a mechanism, not a universal replacement for an RFP.
+
+---
+
+## D16. Auction vs RFP
+
+| Area | RFP | Auction |
+|---|---|---|
+| Main purpose | Structured proposal | Competitive bidding |
+| Response | Broad | More competitive/event-rule focused |
+| Technical evaluation | Common | May happen before/after |
+| Competitive visibility | Configurable | Often important |
+| Typical fit | Complex requirements | Comparable competitive requirements |
+
+One possible strategy:
+
+```text
+RFI
+ ↓
+RFP
+ ↓
+Technical qualification
+ ↓
+Auction
+ ↓
+Final evaluation
+ ↓
+Award
+```
+
+This is only one possible sourcing strategy.
+
+---
+
+## D17. Lots and Split Awards
+
+Example:
+
+```text
+Lot 1 — Laptops
+Lot 2 — Monitors
+Lot 3 — Docking Stations
+Lot 4 — Support
+```
+
+Possible result:
+
+```text
+Supplier A → Lot 1
+Supplier B → Lot 2
+Supplier A → Lot 3
+Supplier C → Lot 4
+```
+
+Split awards can support capacity, geography, risk diversification, specialization, or commercial objectives.
+
+---
+
+## D18. Evaluation Framework
+
+A sourcing evaluation can be organized as:
+
+```text
+                 EVALUATION
+                     │
+       ┌─────────────┼─────────────┐
+       ▼             ▼             ▼
+   Commercial     Technical       Risk
+       │             │             │
+     Price        Capability     Compliance
+     TCO          Support        Financial
+     Terms        Delivery       Regulatory
+```
+
+Additional dimensions may include:
+
+```text
+Quality
+Capacity
+Sustainability
+Warranty
+Service
+Geography
+Implementation
+```
+
+The actual evaluation model is a business/configuration decision.
+
+---
+
+## D19. Weighted Scoring Example
+
+Suppose:
+
+```text
+Price        50%
+Technical    20%
+Delivery     15%
+Quality      10%
+Risk          5%
+```
+
+Supplier A scores:
+
+```text
+Price       = 90
+Technical   = 80
+Delivery    = 90
+Quality     = 80
+Risk        = 100
+```
+
+Calculation:
+
+```text
+90 × .50  = 45
+80 × .20  = 16
+90 × .15  = 13.5
+80 × .10  = 8
+100 × .05 = 5
+
+Total = 87.5
+```
+
+This demonstrates weighted arithmetic only. It does not establish a universal SAP Ariba scoring implementation.
+
+---
+
+## D20. Evaluation vs Award
+
+Keep these concepts separate:
+
+```text
+Supplier Responses
+      ↓
+Evaluation
+      ↓
+Scores / Comparison
+      ↓
+Business Review
+      ↓
+Approval where configured
+      ↓
+Award
+```
+
+Evaluation produces evidence for the decision.
+
+Award allocates the business.
+
+Do not state that the highest numerical score automatically wins unless that is explicitly the configured business process.
+
+---
+
+## D21. Award Models
+
+### Single supplier
+
+```text
+100% → Supplier A
+```
+
+### Split award
+
+```text
+60% → Supplier A
+40% → Supplier B
+```
+
+### Lot-based award
+
+```text
+Lot 1 → Supplier A
+Lot 2 → Supplier B
+Lot 3 → Supplier C
+```
+
+### No award
+
+```text
+No acceptable response
+        ↓
+Revise requirement / re-source
+```
+
+---
+
+## D22. S2C → Contract → P2O Boundary
+
+Conceptual flow:
+
+```text
+Sourcing Event
+      ↓
+Final Response
+      ↓
+Evaluation
+      ↓
+Award
+      ↓
+Commercial / Legal Finalization
+      ↓
+Contract
+      ↓
+Supplier Enablement
+      ↓
+P2O
+```
+
+Do not state that every award automatically creates a contract. The transition depends on the customer's process and solution configuration.
+
+---
+
+## D23. S2C → Business Network → P2O
+
+The downstream relationship can be remembered as:
+
+```text
+S2C
+ ↓
+Award / Contract
+ ↓
+P2O
+ ↓
+Purchase Order
+ ↓
+Business Network
+ ↓
+Supplier
+```
+
+Depending on architecture, supplier collaboration may involve:
+
+```text
+PO
+Order Confirmation
+ASN
+Invoice
+```
+
+Exact integration paths belong to the repository's PnI documentation.
+
+---
+
+## D24. Configuration vs Data vs Transaction
+
+### Configuration
+
+Defines process behavior:
+
+```text
+Event rules
+Templates
+Scoring
+Workflow
+Eligibility rules
+```
+
+### Supplier / master data
+
+Represents business information:
+
+```text
+Supplier
+Category
+Region
+Department
+Contact
+Qualification
+```
+
+### Transaction/event data
+
+Represents a specific activity:
+
+```text
+Sourcing request
+Project
+RFI
+RFP
+Bid
+Response
+Award
+```
+
+Diagnostic question:
+
+> Is the issue happening for one supplier, one event, or many?
+
+That often helps identify the fault domain.
+
+---
+
+## D25. S2C Troubleshooting Framework
+
+Use this before changing configuration:
+
+```text
+INCIDENT
+   ↓
+Exact symptom?
+   ↓
+Lifecycle stage?
+   ↓
+Who is affected?
+   ↓
+What changed?
+   ↓
+Data / configuration / workflow / access / process / integration?
+   ↓
+What evidence proves the failure point?
+   ↓
+Corrective action
+   ↓
+Reprocessing / duplicate-risk check
+   ↓
+Validation
+   ↓
+RCA
+```
+
+### Common issue classes
+
+```text
+Process
+Configuration
+Supplier data
+Workflow
+Access / participation
+Integration
+```
+
+---
+
+## D26. Supplier Registration RCA
+
+### Symptom
+
+Supplier submits registration but cannot progress.
+
+### Investigation
+
+```text
+Registration status
+      ↓
+Mandatory responses
+      ↓
+Validation
+      ↓
+Required documents
+      ↓
+Approval workflow
+      ↓
+Approver status
+      ↓
+Supplier contact
+      ↓
+Activity/history
+```
+
+### RCA structure
+
+```text
+Problem
+Business impact
+Evidence
+Lifecycle stage
+Root cause
+Resolution
+Validation
+Prevention
+```
+
+---
+
+## D27. Qualification RCA
+
+### Symptom
+
+Supplier is registered but cannot participate.
+
+### Trace
+
+```text
+Registered?
+   ↓
+Qualified?
+   ↓
+Correct commodity?
+   ↓
+Correct region?
+   ↓
+Correct department?
+   ↓
+Qualification current?
+   ↓
+Event eligibility?
+   ↓
+Invitation / participation?
+```
+
+Do not solve a qualification problem by simply re-inviting the supplier.
+
+---
+
+## D28. Event Participation RCA
+
+### Symptom
+
+Supplier cannot open or participate in an event.
+
+Check:
+
+```text
+Supplier identity
+Participation status
+Invitation
+Event status
+Event timing
+Prerequisites
+Bidder agreement
+Required profile information
+Supplier contact
+Access/browser evidence
+```
+
+Capture the exact error before escalating.
+
+---
+
+## D29. Bid Submission RCA
+
+If the supplier can access the event but cannot submit:
+
+```text
+Required fields
+      ↓
+Pricing fields
+      ↓
+Currency
+      ↓
+Bid rules
+      ↓
+Minimum / maximum changes
+      ↓
+Timing
+      ↓
+Conditional questions
+      ↓
+Attachments
+      ↓
+Technical/access issue
+```
+
+Classify:
+
+```text
+Business rule
+Configuration
+Validation
+Access
+Technical
+```
+
+before changing anything.
+
+---
+
+## D30. Wrong Evaluation Result
+
+Trace:
+
+```text
+Supplier response
+      ↓
+Question value
+      ↓
+Scoring rule
+      ↓
+Weight
+      ↓
+Calculated score
+      ↓
+Comparison
+      ↓
+Business interpretation
+```
+
+First decide whether the issue is:
+
+```text
+Bad data
+Bad configuration
+Unexpected response
+Calculation issue
+Business interpretation
+```
+
+---
+
+## D31. Approval Troubleshooting
+
+Where approvals are configured:
+
+```text
+Who submitted?
+      ↓
+What object?
+      ↓
+What values triggered approval?
+      ↓
+Which rule matched?
+      ↓
+Who is the approver?
+      ↓
+Pending / rejected / completed?
+      ↓
+Did the next stage start?
+```
+
+Distinguish:
+
+```text
+No workflow
+      ≠
+Pending workflow
+      ≠
+Rejected workflow
+      ≠
+Completed workflow with downstream problem
+```
+
+---
+
+## D32. One Supplier vs Many Suppliers
+
+### One supplier affected
+
+Investigate:
+
+```text
+Supplier profile
+Contact
+Qualification
+Eligibility
+Supplier-specific data
+```
+
+### Many suppliers affected
+
+Investigate:
+
+```text
+Event configuration
+Template
+Rules
+Workflow
+Common data
+Platform/service behavior
+```
+
+This is a diagnostic heuristic, not a universal rule.
+
+---
+
+## D33. One Event vs Many Events
+
+### One event
+
+Check:
+
+```text
+Event-specific rules
+Questions
+Participants
+Timeline
+Scoring
+```
+
+### Many events
+
+Check:
+
+```text
+Shared template
+Shared configuration
+Workflow
+Common master data
+Platform/service behavior
+```
+
+---
+
+## D34. S2C Test Strategy
+
+A production-ready implementation should test more than the happy path.
+
+```text
+Configuration validation
+        ↓
+Functional testing
+        ↓
+Integration testing
+        ↓
+UAT
+        ↓
+Regression
+        ↓
+Go-live readiness
+```
+
+### Test dimensions
+
+| Dimension | Examples |
+|---|---|
+| Supplier | New / existing / inactive |
+| Qualification | Qualified / pending / expired |
+| Event | RFI / RFP / auction |
+| Response | Complete / incomplete |
+| Scoring | Normal / boundary |
+| Award | Single / split |
+| Approval | Approve / reject / return |
+| Access | Correct / incorrect contact |
+| Integration | Success / failure |
+
+---
+
+## D35. S2C Negative Test Pack
+
+```text
+☐ Supplier not qualified
+☐ Qualification expired
+☐ Missing required document
+☐ Missing mandatory answer
+☐ Failed prerequisite
+☐ Invalid pricing value
+☐ Invalid currency
+☐ Bid outside configured rule
+☐ Bid after event closes
+☐ Wrong supplier contact
+☐ Approver rejects
+☐ Approval remains pending
+☐ Duplicate supplier request
+☐ Integration unavailable
+```
+
+Negative tests often expose process weaknesses that happy-path testing misses.
+
+---
+
+## D36. Sample Test Cases
+
+### TC-S2C-001 — Registration
+
+```text
+1. Invite supplier.
+2. Supplier completes mandatory fields.
+3. Supplier submits.
+4. Reviewer processes registration.
+
+Expected:
+Process advances according to configured workflow.
+```
+
+### TC-S2C-002 — Qualification
+
+```text
+1. Start qualification.
+2. Supplier completes questionnaire.
+3. Supplier submits.
+4. Reviewer evaluates.
+
+Expected:
+Qualification progresses according to configured lifecycle.
+```
+
+### TC-S2C-003 — RFP
+
+```text
+1. Create RFP.
+2. Configure technical/commercial sections.
+3. Invite eligible suppliers.
+4. Collect responses.
+5. Evaluate.
+
+Expected:
+Responses can be compared using configured criteria.
+```
+
+### TC-S2C-004 — Auction
+
+```text
+1. Configure auction.
+2. Validate rules.
+3. Invite suppliers.
+4. Run event.
+5. Review result.
+
+Expected:
+Event follows configured timing, bidding and visibility rules.
+```
+
+### TC-S2C-005 — Split Award
+
+```text
+1. Complete evaluation.
+2. Allocate quantities.
+3. Complete required approval.
+
+Expected:
+Award reflects the intended allocation.
+```
+
+---
+
+## D37. Cutover Checklist
+
+### Supplier
+
+```text
+☐ Supplier population validated
+☐ Contacts validated
+☐ Categories validated
+☐ Qualifications validated
+☐ Required documents available
+```
+
+### Sourcing
+
+```text
+☐ Templates validated
+☐ RFI tested
+☐ RFP tested
+☐ Auction tested where applicable
+☐ Questions validated
+☐ Pricing validated
+☐ Scoring validated
+☐ Rules validated
+```
+
+### Workflow
+
+```text
+☐ Approvers validated
+☐ Approval path tested
+☐ Rejection tested
+☐ Rework tested
+```
+
+### Support
+
+```text
+☐ Runbook published
+☐ Ownership defined
+☐ Escalation path defined
+☐ Known issues documented
+```
+
+---
+
+## D38. Production Support Ownership
+
+A practical conceptual ownership model:
+
+| Area | Typical owner |
+|---|---|
+| Supplier data | Supplier management / procurement |
+| Qualification | Supplier management / category team |
+| Event configuration | Sourcing / functional team |
+| Workflow | Functional/configuration team |
+| Integration | Integration/technical team |
+| Access | Security/administration |
+| Supplier-side issue | Supplier enablement/network support |
+| Business decision | Procurement/sourcing |
+| ERP issue | ERP/integration team |
+
+Ownership varies by organization.
+
+---
+
+## D39. S2C Monitoring
+
+Monitor at three levels.
+
+### Business
+
+```text
+Open events
+Pending supplier responses
+Pending approvals
+Upcoming deadlines
+```
+
+### Process
+
+```text
+Registration pending
+Qualification pending
+Participation issues
+Evaluation pending
+Award pending
+```
+
+### Technical
+
+```text
+Integration failures
+Service/API failures
+Authentication failures
+Message failures
+```
+
+---
+
+## D40. Useful S2C Metrics
+
+Possible metrics:
+
+```text
+Time to onboard supplier
+Time to qualify supplier
+Supplier response rate
+RFP response rate
+Auction participation
+Sourcing cycle time
+Award cycle time
+Contract transition time
+Supplier participation rate
+Savings / negotiated improvement
+```
+
+Metrics should be defined according to business objectives and available data.
+
+---
+
+## D41. S2C Incident RCA Template
+
+```markdown
+# Incident: <Short title>
+
+## Problem
+What happened?
+
+## Business Impact
+Who/what was affected?
+
+## Scope
+Supplier / event / category / region.
+
+## Symptoms
+Exact observed behavior.
+
+## Evidence
+Statuses, IDs, timestamps, errors, screenshots where permitted.
+
+## Trace Path
+Supplier → eligibility → event → response → evaluation → award.
+
+## Root Cause
+What actually caused the issue?
+
+## Resolution
+What was changed?
+
+## Validation
+How was success confirmed?
+
+## Reprocessing
+Was reprocessing required? Was there duplicate risk?
+
+## Prevention
+What should prevent recurrence?
+```
+
+---
+
+## D42. Practical Lab — Build an RFP
+
+### Requirement
+
+```text
+5,000 laptops
+India-wide delivery
+3-year warranty
+Onsite support
+```
+
+Design:
+
+```text
+1. Supplier prerequisites
+2. Technical questions
+3. Commercial questions
+4. Pricing model
+5. Evaluation weights
+6. Award strategy
+```
+
+Deliverable:
+
+```text
+RFP
+├── Eligibility
+├── Technical
+├── Commercial
+├── Pricing
+├── Evaluation
+└── Award
+```
+
+---
+
+## D43. Practical Lab — Qualification Matrix
+
+Create:
+
+| Supplier | Commodity | Region | Department | Qualification |
+|---|---|---|---|---|
+| A | IT Hardware | India | IT | Qualified |
+| A | Construction | India | Facilities | Not evaluated |
+| B | IT Hardware | India | IT | Pending |
+| C | IT Hardware | Germany | IT | Qualified |
+
+Then answer:
+
+```text
+Who is eligible for an India IT Hardware event?
+Which supplier requires qualification action?
+What additional checks are required?
+```
+
+---
+
+## D44. Practical Lab — Auction Decision
+
+Given:
+
+```text
+Suppliers = 8
+Product = standardized laptops
+Specifications = comparable
+Price = major evaluation factor
+Market = competitive
+```
+
+Document your reasoning for:
+
+```text
+RFI?
+RFP?
+Auction?
+Prerequisites?
+Bid visibility?
+Evaluation after auction?
+Award model?
+```
+
+The exercise is about designing a sourcing strategy, not memorizing one correct sequence.
+
+---
+
+## D45. Practical Lab — Production Incident
+
+### Incident
+
+> Supplier can open an RFP but receives an error while submitting the commercial response.
+
+Investigate:
+
+```text
+1. Event status
+2. Participation
+3. Required fields
+4. Pricing fields
+5. Currency
+6. Bid rules
+7. Conditional questions
+8. Attachments
+9. Exact error
+10. Technical/access evidence
+```
+
+Produce:
+
+```text
+Problem
+Evidence
+Root Cause
+Resolution
+Validation
+Prevention
+```
+
+---
+
+## D46. Interview Answer Formula
+
+For most S2C questions:
+
+```text
+Definition
+   ↓
+Business purpose
+   ↓
+Process flow
+   ↓
+Example
+   ↓
+Configuration caveat
+   ↓
+Exception / troubleshooting
+```
+
+### Example — Qualification
+
+```text
+Definition:
+Qualification assesses supplier suitability.
+
+Purpose:
+It determines whether a supplier is suitable for a defined business
+context.
+
+Flow:
+Supplier → questionnaire → submission → review → decision.
+
+Example:
+Cybersecurity + India + Information Security.
+
+Caveat:
+The lifecycle and statuses depend on configuration.
+
+Troubleshooting:
+Check qualification status, commodity, region, department and
+event eligibility.
+```
+
+---
+
+## D47. High-Value Interview Scenarios
+
+### 1. Supplier registered but not qualified
+
+Check:
+
+```text
+Registration
+Qualification
+Commodity
+Region
+Department
+Current status
+Event eligibility
+```
+
+### 2. Supplier cannot participate
+
+Check:
+
+```text
+Invitation
+Participation
+Prerequisites
+Event status
+Timing
+Supplier contact
+Eligibility
+```
+
+### 3. Supplier cannot bid
+
+Check:
+
+```text
+Required fields
+Pricing
+Currency
+Bid rules
+Timing
+Conditional questions
+Exact error
+```
+
+### 4. Lowest price supplier was not awarded
+
+Explain that award may consider configured commercial and non-commercial evaluation criteria and the business decision process.
+
+### 5. Why RFI before RFP?
+
+Explain that RFI can reduce uncertainty about supplier capability and market options before a more structured proposal process.
+
+### 6. Why not auction everything?
+
+Explain that auctions are more suitable where suppliers can compete meaningfully under comparable requirements and the market supports that strategy.
+
+---
+
+## D48. One-Page S2C Revision
+
+```text
+S2C
+│
+├── STRATEGY
+│   ├── Category
+│   ├── Requirement
+│   └── Supplier strategy
+│
+├── SLP
+│   ├── Request
+│   ├── Registration
+│   ├── Qualification
+│   ├── Requalification
+│   └── Lifecycle
+│
+├── SOURCING
+│   ├── Request
+│   ├── Project
+│   ├── RFI
+│   ├── RFP
+│   └── Auction
+│
+├── EVENT
+│   ├── Participants
+│   ├── Prerequisites
+│   ├── Questions
+│   ├── Pricing
+│   ├── Rules
+│   └── Visibility
+│
+├── RESPONSE
+│   ├── Technical
+│   ├── Commercial
+│   ├── Bid
+│   └── Attachments
+│
+├── EVALUATION
+│   ├── Comparison
+│   ├── Scoring
+│   └── Weighted criteria
+│
+├── AWARD
+│   ├── Single
+│   ├── Multiple
+│   ├── Split
+│   └── No award
+│
+└── EXECUTION
+    ├── Contract
+    ├── P2O
+    ├── Business Network
+    └── ERP / S4
+```
+
+---
+
+## D49. Repository Improvement Plan
+
+The S2C guide should remain the conceptual master guide. Add smaller practical artifacts alongside it rather than endlessly increasing its size.
+
+Recommended future structure:
+
+```text
+s2c/
+├── README.md
+├── sample-rfi.md
+├── sample-rfp.md
+├── sample-auction.md
+├── supplier-qualification-matrix.md
+├── weighted-scoring-example.md
+├── split-award-example.md
+├── supplier-onboarding-rca.md
+├── qualification-issue-rca.md
+├── event-participation-rca.md
+├── auction-bid-rca.md
+├── s2c-test-cases.md
+└── s2c-interview-scenarios.md
+```
+
+This turns the repository from a documentation-only resource into a reusable practice/reference library.
+
+---
+
+## D50. Accuracy Rule
+
+Use this hierarchy when explaining S2C:
+
+```text
+Current SAP documentation
+        +
+Customer configuration
+        +
+Actual system evidence
+        ↓
+Conclusion
+```
+
+Avoid:
+
+> "SAP Ariba always works this way."
+
+Prefer:
+
+> "This is the conceptual flow; the exact behavior should be verified against the customer's configuration, solution/release, and current SAP documentation."
+
+This is particularly important for production support and consulting interviews.
+
+---
+
+## D51. Final S2C Mental Model
+
+```text
+BUSINESS REQUIREMENT
+        ↓
+CATEGORY STRATEGY
+        ↓
+SUPPLIER LIFECYCLE
+        ↓
+REGISTRATION
+        ↓
+QUALIFICATION
+        ↓
+SOURCING STRATEGY
+        ↓
+SOURCING REQUEST
+        ↓
+SOURCING PROJECT
+        ↓
+RFI / RFP / AUCTION
+        ↓
+SUPPLIER RESPONSES
+        ↓
+EVALUATION / SCORING
+        ↓
+AWARD
+        ↓
+CONTRACT
+        ↓
+DOWNSTREAM PROCUREMENT
+        ↓
+P2O
+        ↓
+BUSINESS NETWORK / ERP
+```
+
+The core distinctions remain:
+
+> **SLP manages supplier lifecycle and eligibility.**
+
+> **Sourcing manages competitive supplier selection and commercial evaluation.**
+
+> **Award allocates the business.**
+
+> **Contract formalizes the commercial/legal relationship.**
+
+> **P2O executes downstream purchasing.**
+
+---
+
+
 # 61. Official References
 
 The following SAP documentation should be used to validate product behavior and current capabilities:
