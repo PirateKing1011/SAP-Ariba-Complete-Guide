@@ -1,6 +1,6 @@
 # SAP MM — Detailed Practical Guide
 
-> **File:** `08-SAP-MM.md`  
+> **File:** `07-SAP-MM.md`  
 > **Purpose:** A practical SAP Materials Management (MM) guide for SAP Ariba professionals, P2P consultants, integration/support engineers, and interview preparation.
 >
 > **Scope:** This guide explains how SAP MM works, SAP GUI/logon concepts, organizational hierarchy, procurement and inventory processes, master data, important transactions, the relationship between SAP MM and SAP Ariba, similarities/differences, practical examples, integration flows, troubleshooting, and interview-oriented revision.
