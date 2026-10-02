@@ -50,7 +50,7 @@ A practical architecture reference for understanding how SAP Ariba solutions exc
                   ERP Processing
 ```
 
-SAP documents Managed Gateway integration with SAP ERP/S/4HANA and identifies Cloud Connector as a secure connectivity component between cloud services and on-premise systems. citeturn0search1turn0search14
+SAP documents Managed Gateway integration with SAP ERP/S/4HANA and identifies Cloud Connector as a secure connectivity component between cloud services and on-premise systems.
 
 ---
 
@@ -189,7 +189,7 @@ Depending on the scenario, integration may involve:
 
 Do **not** assume every transaction uses the same technical path.
 
-SAP's current documentation uses the name **SAP Integration Suite, managed gateway for spend management and SAP Business Network**. citeturn0search0turn0search14
+SAP's current documentation uses the name **SAP Integration Suite, managed gateway for spend management and SAP Business Network**. 
 
 ---
 
@@ -214,7 +214,7 @@ SAP Cloud Connector provides secure connectivity between SAP cloud services and 
               ECC / S4
 ```
 
-SAP describes Cloud Connector as an on-premise component that acts as a secure link/reverse-invoke proxy between cloud services and existing on-premise systems. citeturn0search16turn0search17
+SAP describes Cloud Connector as an on-premise component that acts as a secure link/reverse-invoke proxy between cloud services and existing on-premise systems. 
 
 ### Cloud Connector is NOT
 
@@ -377,7 +377,7 @@ Managed Gateway / CIG
 SAP Ariba / Business Network
 ```
 
-SAP's installation documentation describes outbound ERP transactions flowing through integration components to SAP Ariba, while inbound Ariba transactions can pass through Managed Gateway, integration components and Cloud Connector to ERP/S/4HANA. citeturn0search0
+SAP's installation documentation describes outbound ERP transactions flowing through integration components to SAP Ariba, while inbound Ariba transactions can pass through Managed Gateway, integration components and Cloud Connector to ERP/S/4HANA.
 
 ---
 
