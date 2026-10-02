@@ -163,7 +163,7 @@ Core administration commonly involves:
 - catalog administration
 - Guided Buying administration
 
-SAP's current common-data administration guide explicitly covers common master data such as users, suppliers, and accounting information and notes that each procurement solution also has solution-specific data. citeturn0search16
+SAP's current common-data administration guide explicitly covers common master data such as users, suppliers, and accounting information and notes that each procurement solution also has solution-specific data.
 
 ---
 
@@ -224,8 +224,7 @@ IF requester has manager
 THEN add manager to approval flow
 ```
 
-SAP documents the manager rule as a common approval pattern. citeturn0search5turn0search6
-
+SAP documents the manager rule as a common approval pattern.
 If the manager relationship is missing or wrong, the approval flow may behave unexpectedly.
 
 ---
@@ -799,7 +798,7 @@ Line-item editing capabilities depend on the item type. SAP documentation states
 
 A **purchase requisition** is the approvable document created when a user submits a request to purchase goods or services.
 
-SAP identifies a PR with a unique ID and states that it can contain customer catalog and non-catalog items; aggregated requisitions and amendments are also supported in applicable solutions. citeturn0search17
+SAP identifies a PR with a unique ID and states that it can contain customer catalog and non-catalog items; aggregated requisitions and amendments are also supported in applicable solutions.
 
 Example:
 
@@ -994,7 +993,7 @@ PR
 
 Approval logic can inspect line-level information.
 
-SAP gives examples where approval conditions can depend on line-item commodity information. citeturn0search5
+SAP gives examples where approval conditions can depend on line-item commodity information. cite.5
 
 ---
 
@@ -1109,7 +1108,7 @@ Delivery information is important for:
 
 The approval process determines who needs to review or approve an approvable.
 
-SAP describes approval processes as sets of rules for specific approvable types, with rules evaluated based on document content. citeturn0search5
+SAP describes approval processes as sets of rules for specific approvable types, with rules evaluated based on document content. cite.5
 
 Simplified example:
 
@@ -1145,7 +1144,7 @@ IF total amount > ₹5,00,000
 THEN add Finance Manager
 ```
 
-SAP documents approval rules as conditions plus actions. Conditions determine when a rule applies; actions add/remove approvers or otherwise affect the flow. citeturn0search2
+SAP documents approval rules as conditions plus actions. Conditions determine when a rule applies; actions add/remove approvers or otherwise affect the flow. cite.2
 
 ---
 
@@ -1174,7 +1173,7 @@ IF amount > threshold
 THEN add Finance
 ```
 
-SAP identifies base rules as one of the core approval rule types. citeturn0search20
+SAP identifies base rules as one of the core approval rule types. cite.20
 
 ---
 
@@ -1196,7 +1195,7 @@ Director
 
 This is useful when approvals must follow organizational hierarchy.
 
-SAP documents chain rules as being associated with a base rule and used to add a management hierarchy. citeturn0search2
+SAP documents chain rules as being associated with a base rule and used to add a management hierarchy. cite.2
 
 ---
 
@@ -1223,11 +1222,11 @@ IT Manager
 
 A common use is removing duplicate approvers.
 
-SAP specifically describes approval filter rules as predefined filters that can eliminate duplicate approvers added individually. citeturn0search0
+SAP specifically describes approval filter rules as predefined filters that can eliminate duplicate approvers added individually. cite.0
 
 Important:
 
-> Filter rules remove duplicate individual approvers; SAP notes that they do not remove duplicate approvers added as groups. citeturn0search0
+> Filter rules remove duplicate individual approvers; SAP notes that they do not remove duplicate approvers added as groups. cite.0
 
 ---
 
@@ -1249,7 +1248,7 @@ Allow / prevent edit
 May require reapproval
 ```
 
-SAP states that edit rules can prevent users from editing submitted approvables and can determine whether an edited document must be resubmitted/reapproved. citeturn0search20
+SAP states that edit rules can prevent users from editing submitted approvables and can determine whether an edited document must be resubmitted/reapproved. cite.20
 
 ---
 
@@ -1299,7 +1298,7 @@ Approver must complete required data
 Approve
 ```
 
-SAP identifies validation rules as separate from the approval process itself; they can require missing header/line information to be completed before approval or rejection. citeturn0search14
+SAP identifies validation rules as separate from the approval process itself; they can require missing header/line information to be completed before approval or rejection. cite.14
 
 ---
 
@@ -1323,7 +1322,7 @@ Policy requires competitive bids
 User must follow sourcing/bidding policy
 ```
 
-SAP currently documents policy rules for collaborative requisitions and shopping carts, including the N Bids and a Buy policy. citeturn0search20
+SAP currently documents policy rules for collaborative requisitions and shopping carts, including the N Bids and a Buy policy. cite.20
 
 ---
 
@@ -1347,7 +1346,7 @@ SAP documents the processing sequence as:
 6. Validation rules
 ```
 
-More precisely, SAP states that base and associated chain rules generate unfiltered approvers; filter rules then remove/pass approvers; edit rules determine modification behavior; validation rules determine missing information requirements for approvers who can edit. citeturn0search14
+More precisely, SAP states that base and associated chain rules generate unfiltered approvers; filter rules then remove/pass approvers; edit rules determine modification behavior; validation rules determine missing information requirements for approvers who can edit. cite.14
 
 ---
 
@@ -1375,7 +1374,7 @@ Request ├── IT
 
 The parallel approvers can act independently.
 
-SAP's approval-rule editor supports serial and parallel rules and conditional approvers. citeturn0search1
+SAP's approval-rule editor supports serial and parallel rules and conditional approvers. cite.1
 
 ---
 
@@ -1394,7 +1393,7 @@ IF requester ≠ preparer
 THEN Requester approval
 ```
 
-Multiple conditions can be combined using logical operators. SAP documents document-field matches and subconditions as components of approval conditions. citeturn0search4
+Multiple conditions can be combined using logical operators. SAP documents document-field matches and subconditions as components of approval conditions. cite.4
 
 ---
 
@@ -1423,7 +1422,7 @@ Lookup
 CIO
 ```
 
-SAP documents approver lookup tables as a way to add approvers based on data such as commodity codes. citeturn0search2
+SAP documents approver lookup tables as a way to add approvers based on data such as commodity codes. cite.2
 
 ---
 
@@ -1525,7 +1524,7 @@ Sourcing Request Sent
 Collaborating
 ```
 
-SAP's current requisition reference lists statuses including Approved, Canceled, Denied, Invalid, Ordering, Ordered, Receiving, Received, Submitted, and Sourcing Request Sent. citeturn0search17
+SAP's current requisition reference lists statuses including Approved, Canceled, Denied, Invalid, Ordering, Ordered, Receiving, Received, Submitted, and Sourcing Request Sent. .
 
 ---
 
@@ -1543,7 +1542,7 @@ Amendment
 PR123-A1
 ```
 
-SAP documents amendments using the main requisition ID plus an `-A` suffix and sequence number. citeturn0search17
+SAP documents amendments using the main requisition ID plus an `-A` suffix and sequence number. .
 
 ---
 
@@ -1567,7 +1566,7 @@ Supplier Selection
 Back to procurement process
 ```
 
-SAP documents a workflow where a sourcing request can be initiated from requisition line items and sent to SAP Ariba Sourcing, creating a sourcing project. SAP also notes that edits made in the sourcing project may need to be manually reflected in the corresponding requisition because automatic synchronization is not supported in that scenario. citeturn0search7
+SAP documents a workflow where a sourcing request can be initiated from requisition line items and sent to SAP Ariba Sourcing, creating a sourcing project. SAP also notes that edits made in the sourcing project may need to be manually reflected in the corresponding requisition because automatic synchronization is not supported in that scenario. cite.7
 
 This is an important **S2C ↔ P2O connection**.
 
@@ -2391,7 +2390,7 @@ Manager
 IT Manager
 ```
 
-SAP explicitly documents this use case. citeturn0search0
+SAP explicitly documents this use case. cite.0
 
 ---
 
@@ -2453,7 +2452,7 @@ Check edit/validation behavior.
 
 Preview/test the approval flow where supported.
 
-SAP's configurable approval rules support browser-based rule management and testing/previewing of generated approval flows for selected test approvables. citeturn0search13
+SAP's configurable approval rules support browser-based rule management and testing/previewing of generated approval flows for selected test approvables. cite.13
 
 ---
 
@@ -3047,7 +3046,7 @@ Chain rules
 Filter rules
 ```
 
-A filter rule may remove a duplicate individual approver according to the configured filtering behavior. citeturn0search0
+A filter rule may remove a duplicate individual approver according to the configured filtering behavior. cite.0
 
 ---
 
