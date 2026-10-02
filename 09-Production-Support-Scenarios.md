@@ -1,0 +1,2575 @@
+# SAP Ariba Production Support Scenarios
+
+> A practical incident-analysis and troubleshooting playbook for SAP
+> Ariba functional consultants, integration/support engineers, and
+> interview preparation.
+
+This guide focuses on **how to investigate production problems**, not
+simply how to define SAP Ariba components.
+
+The core principle is:
+
+``` text
+Symptom
+   ↓
+Transaction / Document
+   ↓
+Direction
+   ↓
+Failure Layer
+   ↓
+Evidence
+   ↓
+Root Cause
+   ↓
+Fix
+   ↓
+Safe Reprocessing
+   ↓
+Business Validation
+   ↓
+RCA / Prevention
+```
+
+> **Important:** The exact technical path, monitoring tool, interface,
+> document ownership, and reprocessing method depend on the customer
+> landscape, SAP product/release, integration architecture, and
+> configuration. Treat the scenarios below as investigation patterns,
+> not universal implementation instructions.
+
+------------------------------------------------------------------------
+
+# 1. How to Use This Guide
+
+A production support engineer should avoid jumping directly to:
+
+> "Retry the transaction."
+
+Instead ask:
+
+1.  What business process is affected?
+2.  Which document is affected?
+3.  What is the document/transaction ID?
+4.  Is the issue inbound or outbound?
+5.  Where was the last successful handoff?
+6.  What exact error was returned?
+7.  Which component generated that error?
+8.  Is the failure technical, configuration-related,
+    master-data-related, or business-validation-related?
+9.  Has the same transaction already been processed?
+10. Is reprocessing safe?
+11. How do we prove the business result is correct?
+12. What should be documented in the RCA?
+
+------------------------------------------------------------------------
+
+# 2. Failure-Layer Model
+
+A useful investigation model is:
+
+``` text
+Business Process
+      ↓
+SAP Ariba Application
+      ↓
+SAP Business Network
+      ↓
+Managed Gateway / Integration Layer
+      ↓
+Authentication / Authorization
+      ↓
+Mapping / Transformation
+      ↓
+Network / Connectivity
+      ↓
+SAP Cloud Connector
+      ↓
+ECC / S/4HANA Interface
+      ↓
+SAP Application
+      ↓
+Business Validation
+      ↓
+Master Data / Configuration
+```
+
+A failure appearing in one layer does not automatically mean that layer
+caused the problem.
+
+For example:
+
+``` text
+Ariba
+  ↓ SUCCESS
+Gateway
+  ↓ SUCCESS
+Cloud Connector
+  ↓ SUCCESS
+ERP
+  ↓ REJECTED
+Invalid Plant
+```
+
+The transport path worked.
+
+The business transaction failed because the ERP rejected the data.
+
+------------------------------------------------------------------------
+
+# 3. HTTP Error Quick Reference
+
+This table is a **first-pass troubleshooting heuristic**. Always confirm
+which component returned the status and inspect the accompanying
+response/body/logs.
+
+  ---------------------------------------------------------------------------
+  HTTP Status       Typical           First Investigation   Typical Evidence
+                    Classification    Area                  
+  ----------------- ----------------- --------------------- -----------------
+  **401**           Authentication    Gateway / endpoint    Credentials,
+                                      authentication        token,
+                                                            authentication
+                                                            response,
+                                                            endpoint logs
+
+  **403**           Authorization     Cloud Connector       Access control,
+                                      access controls /     resource
+                                      endpoint permissions  exposure,
+                                                            authorization
+                                                            response
+
+  **404**           Endpoint /        URL, virtual          Request URL,
+                    resource          host/port, mapping,   endpoint
+                                      endpoint path         configuration,
+                                                            Cloud Connector
+                                                            mapping
+
+  **500**           Server /          Backend/application   ERP logs,
+                    application                             application
+                    failure                                 errors, interface
+                                                            processing
+  ---------------------------------------------------------------------------
+
+### 401 → Authentication
+
+``` text
+401
+ ↓
+Authentication
+ ↓
+Gateway / endpoint logs
+ ↓
+Credential / token investigation
+```
+
+Check:
+
+-   Is the credential/token valid?
+-   Has it expired?
+-   Is the authentication method correct?
+-   Is the request reaching the expected endpoint?
+-   Did the endpoint reject authentication?
+-   Is the error being generated by the gateway, endpoint, or backend?
+
+### 403 → Authorization
+
+``` text
+403
+ ↓
+Authorization
+ ↓
+Cloud Connector / access controls
+ ↓
+Permissions investigation
+```
+
+Check:
+
+-   Is the requested resource exposed?
+-   Is the path permitted?
+-   Is the correct system mapping being used?
+-   Does the technical user have the required authorization?
+-   Which component generated the 403?
+
+### 404 → Endpoint
+
+``` text
+404
+ ↓
+Endpoint / Resource
+ ↓
+URL / Mapping
+ ↓
+Endpoint investigation
+```
+
+Check:
+
+-   Is the URL correct?
+-   Is the host/port correct?
+-   Is the virtual host mapped to the intended internal system?
+-   Is the resource/path correct?
+-   Is the request using the expected endpoint?
+
+### 500 → Backend/Application
+
+``` text
+500
+ ↓
+Backend / Application
+ ↓
+ERP logs
+ ↓
+Business / Interface investigation
+```
+
+Check:
+
+-   Did the request reach the backend?
+-   Did the application throw an error?
+-   Is there an application log?
+-   Is there an ABAP/runtime/interface error?
+-   Is master data invalid?
+-   Is business configuration missing?
+-   Is the payload technically valid but unacceptable to the ERP
+    process?
+
+> A 500 response should not automatically be described as "CIG is down."
+> Identify the component that generated the response first.
+
+------------------------------------------------------------------------
+
+# 4. Standard Incident Investigation Template
+
+For every incident, capture:
+
+``` text
+Incident:
+Business Impact:
+Document:
+Document ID:
+Direction:
+Environment:
+Timestamp:
+Last Successful Layer:
+First Failed Layer:
+Exact Error:
+Error Source:
+Payload Available:
+Master Data Checked:
+Configuration Checked:
+Root Cause:
+Resolution:
+Reprocessing:
+Business Validation:
+Preventive Action:
+```
+
+This creates a repeatable support method instead of ad-hoc
+troubleshooting.
+
+------------------------------------------------------------------------
+
+# 5. Scenario 01 --- PO Not Reaching Supplier
+
+### Symptom
+
+> "Supplier did not receive PO 4500001234."
+
+### Investigation
+
+``` text
+PO exists?
+ ↓
+PO approved?
+ ↓
+PO dispatched?
+ ↓
+Network transaction created?
+ ↓
+Correct supplier/account?
+ ↓
+Trading relationship active?
+ ↓
+Supplier received?
+```
+
+### Check
+
+-   PO status in source application
+-   Output/distribution status
+-   Business Network transaction
+-   Supplier relationship
+-   Receiver/account
+-   Integration transaction
+-   Exact error/status
+
+### Possible root causes
+
+-   PO was never dispatched
+-   Wrong supplier relationship
+-   Routing issue
+-   Supplier account mismatch
+-   Integration failure
+-   Mapping issue
+-   Transaction rejected downstream
+
+### Interview answer
+
+> "I would not immediately conclude that the gateway is down. I would
+> trace the PO from source creation through dispatch, Business Network
+> routing, supplier relationship, and final supplier receipt, then
+> isolate the first failed handoff."
+
+------------------------------------------------------------------------
+
+# 6. Scenario 02 --- PO Exists in Ariba but Not ERP
+
+### Symptom
+
+The PO is visible in the Ariba-side process, but the ERP buyer cannot
+find the expected backend document.
+
+### Investigation
+
+``` text
+PO created
+ ↓
+PO approved
+ ↓
+Outbound transaction generated
+ ↓
+Gateway processing
+ ↓
+Connectivity
+ ↓
+ERP interface
+ ↓
+ERP business processing
+```
+
+### Possible root causes
+
+-   Outbound message not generated
+-   Integration transaction failed
+-   Mapping/value mapping failure
+-   Connectivity failure
+-   Cloud Connector access problem
+-   ERP interface rejection
+-   Backend business validation
+
+### Evidence
+
+Capture:
+
+-   PO/document ID
+-   Integration transaction ID
+-   Payload
+-   Error response
+-   ERP interface/log reference
+-   Timestamp
+
+### Key principle
+
+> "The fact that the PO exists in Ariba proves source creation, not
+> successful ERP processing."
+
+------------------------------------------------------------------------
+
+# 7. Scenario 03 --- Cloud Connector Is Green but Transaction Fails
+
+### Symptom
+
+Cloud Connector shows a healthy connection, but the business transaction
+fails.
+
+### Do not conclude
+
+> "Cloud Connector is working, therefore the transaction should work."
+
+### Investigate
+
+``` text
+Tunnel connected?
+ ↓
+System mapping correct?
+ ↓
+Virtual host/port correct?
+ ↓
+Required resource exposed?
+ ↓
+Request authorized?
+ ↓
+Authentication successful?
+ ↓
+Backend endpoint reachable?
+ ↓
+ERP application accepts request?
+```
+
+### Possible root causes
+
+-   Wrong virtual host/port
+-   Resource not exposed
+-   Incorrect path
+-   Authorization problem
+-   Authentication failure
+-   Backend endpoint issue
+-   ERP application rejection
+
+### Interview answer
+
+> "A green Cloud Connector tunnel proves connectivity between the mapped
+> systems, but it does not prove that the requested resource,
+> authentication, authorization, endpoint, and backend business
+> processing are all successful."
+
+------------------------------------------------------------------------
+
+# 8. Scenario 04 --- HTTP 401
+
+### Symptom
+
+Request fails with:
+
+``` text
+401 Unauthorized
+```
+
+### Classification
+
+``` text
+Authentication
+```
+
+### Investigation
+
+1.  Identify the component returning 401.
+2.  Check endpoint/gateway logs.
+3.  Check authentication method.
+4.  Validate credential/token state.
+5.  Check expiry.
+6.  Confirm the request is going to the expected endpoint.
+7.  Compare with a known-good request if available.
+
+### Likely root causes
+
+-   Expired credential
+-   Invalid credential
+-   Incorrect authentication method
+-   Missing authentication header/token
+-   Wrong endpoint/security configuration
+
+### Safe resolution
+
+Correct the authentication configuration according to the approved
+customer process, then validate with a controlled request.
+
+### Do not say
+
+> "401 means Cloud Connector is down."
+
+It does not establish that conclusion.
+
+------------------------------------------------------------------------
+
+# 9. Scenario 05 --- HTTP 403
+
+### Symptom
+
+Request returns:
+
+``` text
+403 Forbidden
+```
+
+### Classification
+
+``` text
+Authorization
+```
+
+### Investigation
+
+``` text
+403
+ ↓
+Which component returned it?
+ ↓
+Requested resource?
+ ↓
+Cloud Connector system mapping?
+ ↓
+Access control entry?
+ ↓
+Resource/path exposed?
+ ↓
+Backend authorization?
+```
+
+### Possible root causes
+
+-   Resource not allowed
+-   Incorrect access-control configuration
+-   Backend authorization failure
+-   Wrong mapped system
+-   Request reaches a component but is not permitted
+
+### Key distinction
+
+``` text
+401 → Who are you?
+403 → You are identified, but access is not permitted.
+```
+
+Use the exact component response to determine the actual cause.
+
+------------------------------------------------------------------------
+
+# 10. Scenario 06 --- HTTP 404
+
+### Symptom
+
+Request returns:
+
+``` text
+404 Not Found
+```
+
+### Classification
+
+``` text
+Endpoint / Resource
+```
+
+### Investigation
+
+Check:
+
+-   URL
+-   Path
+-   Host
+-   Port
+-   Virtual host
+-   Internal host
+-   System mapping
+-   Resource path
+-   Endpoint configuration
+
+### Possible root causes
+
+-   Wrong endpoint
+-   Wrong URL path
+-   Incorrect virtual-to-internal mapping
+-   Resource does not exist
+-   Wrong service path
+
+### Interview answer
+
+> "For a 404 I would first establish which component returned it, then
+> validate the URL, mapped host/port, resource path, and endpoint
+> configuration."
+
+------------------------------------------------------------------------
+
+# 11. Scenario 07 --- HTTP 500
+
+### Symptom
+
+Request returns:
+
+``` text
+500 Internal Server Error
+```
+
+### Classification
+
+``` text
+Backend / Application
+```
+
+### Investigation
+
+``` text
+Request reached backend?
+ ↓
+Backend log available?
+ ↓
+Application exception?
+ ↓
+Interface error?
+ ↓
+Master-data issue?
+ ↓
+Business configuration?
+```
+
+### Possible root causes
+
+-   Backend application error
+-   Runtime error
+-   Interface processing error
+-   Invalid business data
+-   Missing configuration
+-   Unexpected payload condition
+
+### Useful ERP checks
+
+Depending on the interface:
+
+-   Application logs
+-   SLG1
+-   ST22
+-   SRT_MONI
+-   IDoc monitoring
+-   Relevant application/interface logs
+
+### Key principle
+
+> "500 is a server-side symptom, not proof that the integration
+> middleware is the root cause."
+
+------------------------------------------------------------------------
+
+# 12. Scenario 08 --- PO Reaches Supplier but Supplier Cannot See It
+
+### Symptom
+
+The transaction appears successful on the buyer side, but the supplier
+says:
+
+> "I cannot see the PO."
+
+### Investigation
+
+``` text
+Transaction created?
+ ↓
+Correct supplier?
+ ↓
+Correct supplier account?
+ ↓
+Trading relationship?
+ ↓
+Routing?
+ ↓
+Supplier-side visibility?
+ ↓
+Supplier user/account issue?
+```
+
+### Possible root causes
+
+-   Wrong supplier account
+-   Wrong trading relationship
+-   Routing configuration
+-   Supplier-side account/user issue
+-   Document status/visibility issue
+
+### Do not immediately resend
+
+First determine whether the original PO exists at the network layer.
+
+Otherwise, a resend may create duplicates.
+
+------------------------------------------------------------------------
+
+# 13. Scenario 09 --- Supplier Confirmation Missing
+
+### Symptom
+
+PO was sent, but no order confirmation is visible.
+
+### Investigation
+
+``` text
+Supplier received PO?
+ ↓
+Supplier created confirmation?
+ ↓
+Confirmation submitted?
+ ↓
+Network transaction created?
+ ↓
+Inbound integration?
+ ↓
+Buyer document updated?
+```
+
+### Possible root causes
+
+-   Supplier has not responded
+-   Supplier response failed
+-   Incorrect supplier workflow
+-   Network/routing problem
+-   Inbound integration failure
+-   Mapping/validation failure
+
+### Important
+
+A missing confirmation is not automatically an integration failure.
+
+------------------------------------------------------------------------
+
+# 14. Scenario 10 --- ASN Missing
+
+### Symptom
+
+Supplier says shipment was created, but buyer cannot see the ASN.
+
+### Investigation
+
+``` text
+Supplier shipment created?
+ ↓
+ASN submitted?
+ ↓
+Network received ASN?
+ ↓
+ASN validated?
+ ↓
+Inbound integration?
+ ↓
+ERP receiving process?
+```
+
+### Possible root causes
+
+-   Supplier did not submit ASN
+-   ASN validation failed
+-   Routing problem
+-   Mapping problem
+-   Backend rejection
+-   Supplier-side integration issue
+
+------------------------------------------------------------------------
+
+# 15. Scenario 11 --- GR Exists but Downstream Status Is Missing
+
+### Symptom
+
+Goods receipt appears to have been posted, but the expected status is
+not reflected upstream.
+
+### Investigation
+
+``` text
+GR posted?
+ ↓
+ERP document exists?
+ ↓
+Outbound status generated?
+ ↓
+Integration transaction created?
+ ↓
+Network/Ariba update?
+```
+
+### Possible root causes
+
+-   ERP posting succeeded
+-   Outbound status/update failed
+-   Integration transaction failed
+-   Mapping issue
+-   Connectivity issue
+
+### Key lesson
+
+> A successful ERP business posting does not automatically prove
+> successful status propagation back to the upstream application.
+
+------------------------------------------------------------------------
+
+# 16. Scenario 12 --- Invoice Rejected Because of Quantity Mismatch
+
+### Example
+
+``` text
+PO       = 100
+Receipt  = 90
+Invoice  = 100
+```
+
+### First question
+
+Why is the supplier billing 100 when only 90 were received?
+
+### Investigate
+
+-   Actual delivery
+-   Receipt posting
+-   Partial receipt
+-   Invoice quantity
+-   Tolerance rules
+-   Business exception process
+
+### Possible root causes
+
+-   Supplier invoice error
+-   Receipt not fully posted
+-   Partial delivery
+-   Tolerance configuration
+-   Business process exception
+
+Do not classify this automatically as an integration defect.
+
+------------------------------------------------------------------------
+
+# 17. Scenario 13 --- Invoice Rejected Because of Price Mismatch
+
+### Example
+
+``` text
+PO price       = 100
+Invoice price  = 110
+```
+
+### Investigation
+
+-   PO price
+-   Contract/agreement if applicable
+-   Invoice price
+-   Currency
+-   Quantity
+-   Tolerance
+-   Tax/freight treatment
+-   Supplier invoice
+
+### Root-cause categories
+
+``` text
+Commercial
+Business process
+Configuration
+Master data
+Integration
+```
+
+Classify the issue based on evidence.
+
+------------------------------------------------------------------------
+
+# 18. Scenario 14 --- Duplicate Invoice
+
+### Symptom
+
+The same invoice appears more than once.
+
+### Investigation
+
+``` text
+Same supplier?
+Same invoice number?
+Same amount?
+Same PO?
+Same document ID?
+Same source transaction?
+```
+
+### Possible causes
+
+-   Supplier submitted twice
+-   Retry after timeout
+-   Duplicate message
+-   Reprocessing without idempotency/duplicate controls
+-   Integration replay
+
+### Critical rule
+
+> Never blindly reprocess an invoice when duplicate creation is
+> possible.
+
+First determine whether the business document already exists downstream.
+
+------------------------------------------------------------------------
+
+# 19. Scenario 15 --- Timeout Followed by Duplicate
+
+### Symptom
+
+The first request times out.
+
+A support engineer retries it.
+
+Later, two documents appear.
+
+### What happened?
+
+The first request may have been processed successfully even though the
+response was not received.
+
+``` text
+Request
+ ↓
+Backend processes
+ ↓
+Response lost / timeout
+ ↓
+Support retries
+ ↓
+Second processing
+```
+
+### Lesson
+
+> Transport uncertainty is not the same as business failure.
+
+Before retrying, verify downstream business state.
+
+------------------------------------------------------------------------
+
+# 20. Scenario 16 --- Invalid Plant
+
+### Error
+
+``` text
+Plant 1001 is not valid
+```
+
+### Investigation
+
+``` text
+Payload
+ ↓
+Plant value
+ ↓
+Mapping
+ ↓
+ERP master/configuration
+```
+
+### Possible root causes
+
+-   Wrong plant value in source
+-   Missing value mapping
+-   Plant does not exist in ERP
+-   Plant inactive/not configured for the process
+-   Incorrect transformation
+
+### Key principle
+
+> The error appears in ERP, but the root cause can originate upstream.
+
+------------------------------------------------------------------------
+
+# 21. Scenario 17 --- Invalid Material
+
+### Symptom
+
+ERP rejects a transaction because the material is unknown or invalid.
+
+### Investigation
+
+-   Material number
+-   Material mapping
+-   Material master
+-   Plant extension
+-   Purchasing data
+-   UOM
+-   Supplier/material relationship if relevant
+
+### Classification
+
+This may be:
+
+``` text
+Master Data
+Mapping
+Configuration
+Business Validation
+```
+
+------------------------------------------------------------------------
+
+# 22. Scenario 18 --- Invalid Supplier
+
+### Symptom
+
+Supplier cannot be determined or ERP rejects the supplier.
+
+### Investigation
+
+``` text
+Supplier identity
+ ↓
+Network supplier
+ ↓
+Ariba supplier
+ ↓
+ERP supplier / Business Partner
+ ↓
+Mapping / cross-reference
+```
+
+### Possible root causes
+
+-   Wrong supplier identifier
+-   Missing supplier mapping
+-   Supplier not replicated
+-   Business Partner/vendor setup issue
+-   Supplier inactive
+-   Incorrect relationship
+
+------------------------------------------------------------------------
+
+# 23. Scenario 19 --- Cost Center Rejected
+
+### Symptom
+
+PR/PO/invoice transaction fails because of a cost center.
+
+### Investigation
+
+-   Cost center value
+-   Company code
+-   Controlling area where relevant
+-   Validity period
+-   Mapping
+-   User/accounting configuration
+-   ERP validation
+
+### Root-cause possibilities
+
+``` text
+Wrong master data
+Expired master data
+Wrong mapping
+Wrong company code
+Configuration
+```
+
+------------------------------------------------------------------------
+
+# 24. Scenario 20 --- Mapping Failure
+
+### Symptom
+
+Transaction reaches the integration layer but required data is missing
+or transformed incorrectly.
+
+### Investigation
+
+``` text
+Source payload
+ ↓
+Mapping rule
+ ↓
+Transformed payload
+ ↓
+Target requirement
+```
+
+### Example
+
+``` text
+Source:
+Plant = BLR01
+
+Target expects:
+1001
+```
+
+If the mapping is missing:
+
+``` text
+BLR01
+ ↓
+?
+ ↓
+ERP rejection
+```
+
+### Fix
+
+Identify the mapping/value mapping issue, correct it through the
+approved change process, then validate using a controlled test before
+production reprocessing.
+
+------------------------------------------------------------------------
+
+# 25. Scenario 21 --- XML Is Valid but Transaction Fails
+
+### Symptom
+
+The XML is syntactically valid.
+
+The transaction still fails.
+
+### Why?
+
+``` text
+Well-formed XML
+        ≠
+Valid business transaction
+```
+
+A payload can be:
+
+-   syntactically valid
+-   structurally valid
+-   schema-valid
+
+and still fail business validation.
+
+### Example
+
+``` text
+XML syntax = valid
+Plant = invalid
+Currency = unsupported
+Supplier = unknown
+```
+
+The ERP can still reject it.
+
+------------------------------------------------------------------------
+
+# 26. Scenario 22 --- Authentication Works but Authorization Fails
+
+### Symptom
+
+Authentication succeeds, but access is denied.
+
+### Pattern
+
+``` text
+Authentication
+     ↓ SUCCESS
+Authorization
+     ↓ FAILURE
+403
+```
+
+### Investigate
+
+-   User/service identity
+-   Resource
+-   Endpoint
+-   Cloud Connector access controls
+-   Backend permissions
+-   Required roles/authorizations
+
+### Interview distinction
+
+> Authentication establishes identity. Authorization determines whether
+> that identity can perform the requested action.
+
+------------------------------------------------------------------------
+
+# 27. Scenario 23 --- Certificate Expiry
+
+### Symptom
+
+Integration suddenly stops after previously working.
+
+### Investigation
+
+Look for:
+
+-   Certificate expiry
+-   Trust configuration
+-   TLS/security changes
+-   Endpoint changes
+-   Recent deployment/change
+
+### Timeline matters
+
+If:
+
+``` text
+Worked until 23:59
+Failed after certificate expiry
+```
+
+the timing is strong evidence.
+
+Still validate through logs before declaring root cause.
+
+------------------------------------------------------------------------
+
+# 28. Scenario 24 --- Cloud Connector Tunnel Down
+
+### Symptom
+
+The Cloud Connector connection is unavailable.
+
+### Investigation
+
+``` text
+Cloud Connector service
+ ↓
+Subaccount connection
+ ↓
+Tunnel
+ ↓
+System mapping
+ ↓
+Access control
+```
+
+### Possible causes
+
+-   Connector service unavailable
+-   Network issue
+-   Subaccount connection issue
+-   Credential/configuration issue
+-   System mapping problem
+
+### Next step
+
+Check whether the issue affects:
+
+-   one mapped system
+-   one resource
+-   one environment
+-   all integrations
+
+Scope helps isolate the cause.
+
+------------------------------------------------------------------------
+
+# 29. Scenario 25 --- Resource Not Exposed in Cloud Connector
+
+### Symptom
+
+Connection is healthy, but requested backend resource cannot be
+accessed.
+
+### Investigation
+
+``` text
+Tunnel = GREEN
+System Mapping = ?
+Access Control = ?
+Resource = ?
+Path = ?
+```
+
+### Key lesson
+
+A healthy tunnel does not automatically expose every backend resource.
+
+Validate the specific system mapping and resource access configuration.
+
+------------------------------------------------------------------------
+
+# 30. Scenario 26 --- IDoc Failed
+
+### Symptom
+
+An IDoc exists but has an error status.
+
+### Investigation
+
+``` text
+IDoc number
+ ↓
+Status
+ ↓
+Status message
+ ↓
+Segment/data
+ ↓
+Partner profile
+ ↓
+Application processing
+```
+
+### Useful tools
+
+Depending on the landscape:
+
+-   WE02 / WE05
+-   BD87
+-   WE20
+-   Application logs
+-   Related ERP transaction/logs
+
+### Do not
+
+Blindly reprocess before understanding the failure.
+
+------------------------------------------------------------------------
+
+# 31. Scenario 27 --- Web Service / SOAP Processing Failure
+
+### Symptom
+
+A web-service-based interface fails.
+
+### Investigation
+
+-   Message ID
+-   Timestamp
+-   Endpoint
+-   SOAP response
+-   Application error
+-   Payload
+-   SRT monitoring
+-   Backend application logs
+
+### Useful tool
+
+``` text
+SRT_MONI
+```
+
+Where applicable.
+
+------------------------------------------------------------------------
+
+# 32. Scenario 28 --- Background Job Failed
+
+### Symptom
+
+A scheduled integration/master-data process did not complete.
+
+### Investigation
+
+``` text
+Job name
+ ↓
+Job status
+ ↓
+Start/end time
+ ↓
+Step
+ ↓
+Job log
+ ↓
+Underlying program/interface
+```
+
+### Useful tool
+
+``` text
+SM37
+```
+
+Then follow the failure into the relevant application/interface log.
+
+------------------------------------------------------------------------
+
+# 33. Scenario 29 --- Application Log Error
+
+### Symptom
+
+Integration reaches ERP, but application processing fails.
+
+### Investigation
+
+Use the relevant application log where applicable.
+
+``` text
+SLG1
+```
+
+Check:
+
+-   Object
+-   Subobject
+-   Timestamp
+-   User
+-   Error message
+-   Related document
+
+### Principle
+
+Application logs often provide more business-specific information than
+the transport-layer response.
+
+------------------------------------------------------------------------
+
+# 34. Scenario 30 --- ABAP Runtime Error
+
+### Symptom
+
+Backend processing produces an ABAP/runtime dump.
+
+### Investigation
+
+``` text
+ST22
+```
+
+Capture:
+
+-   Dump type
+-   Program/class
+-   Timestamp
+-   User
+-   Call stack
+-   Relevant input/context
+
+### Escalation
+
+If required, provide the exact dump evidence to the appropriate
+SAP/ABAP/application team rather than guessing the cause.
+
+------------------------------------------------------------------------
+
+# 35. Scenario 31 --- Wrong Approver
+
+### Symptom
+
+PR or approval workflow is routed to the wrong person.
+
+### Investigation
+
+``` text
+Request data
+ ↓
+User
+ ↓
+Organization
+ ↓
+Approval rule
+ ↓
+Approver determination
+ ↓
+Result
+```
+
+### Possible root causes
+
+-   Wrong user attributes
+-   Wrong organizational data
+-   Approval rule
+-   Group/role membership
+-   Master-data issue
+-   Configuration
+
+### Important
+
+Do not change approval configuration in production without understanding
+the rule and impact.
+
+------------------------------------------------------------------------
+
+# 36. Scenario 32 --- PR Stuck in Approval
+
+### Investigation
+
+Ask:
+
+1.  Is the PR actually awaiting approval?
+2.  Which approval step is pending?
+3.  Who is the approver?
+4.  Is the approver active?
+5.  Did the rule evaluate correctly?
+6.  Is there an escalation/delegation issue?
+7.  Is this a configuration issue or a user/action issue?
+
+### Possible root causes
+
+-   Approver unavailable
+-   Rule mismatch
+-   User/group issue
+-   Workflow configuration
+-   Delegation issue
+
+------------------------------------------------------------------------
+
+# 37. Scenario 33 --- Catalog Item Not Available
+
+### Symptom
+
+User cannot find an expected catalog item.
+
+### Investigation
+
+``` text
+Catalog active?
+ ↓
+Item active?
+ ↓
+User eligible?
+ ↓
+Commodity/category?
+ ↓
+Supplier?
+ ↓
+Catalog visibility?
+ ↓
+Effective date?
+```
+
+### Possible root causes
+
+-   Item expired
+-   Catalog not loaded
+-   User entitlement
+-   Category mismatch
+-   Supplier/catalog issue
+-   Search/index behavior
+-   Catalog configuration
+
+------------------------------------------------------------------------
+
+# 38. Scenario 34 --- Supplier Onboarding Failure
+
+### Symptom
+
+Supplier cannot transact with the buyer.
+
+### Investigation
+
+``` text
+Supplier created?
+ ↓
+Registration complete?
+ ↓
+Qualification complete?
+ ↓
+Network account?
+ ↓
+Trading relationship?
+ ↓
+Connectivity?
+ ↓
+Test transaction?
+```
+
+### Key lesson
+
+Supplier onboarding is both a business and technical process.
+
+------------------------------------------------------------------------
+
+# 39. Scenario 35 --- Wrong Supplier Account
+
+### Symptom
+
+PO is sent, but the wrong supplier account receives it.
+
+### Investigation
+
+-   Supplier identity
+-   Supplier account
+-   Network relationship
+-   Routing
+-   Supplier master data
+-   Mapping/cross-reference
+
+### Priority
+
+Treat incorrect routing as a potentially high-impact business issue.
+
+Do not simply resend the PO until the routing problem is understood.
+
+------------------------------------------------------------------------
+
+# 40. Scenario 36 --- PO Change Not Reflected
+
+### Symptom
+
+Buyer changes a PO, but supplier still sees the old version.
+
+### Investigation
+
+``` text
+PO changed?
+ ↓
+Change approved?
+ ↓
+Change output generated?
+ ↓
+Network transaction created?
+ ↓
+Supplier received update?
+ ↓
+Supplier system processed update?
+```
+
+### Possible causes
+
+-   Change not released
+-   Output not generated
+-   Integration failure
+-   Supplier-side processing failure
+-   Version/status issue
+
+------------------------------------------------------------------------
+
+# 41. Scenario 37 --- Partial Delivery
+
+### Example
+
+``` text
+PO       = 100
+ASN      = 60
+GR       = 60
+Invoice  = 60
+```
+
+This can be a valid business flow.
+
+### Do not classify
+
+> "PO quantity and invoice quantity are different, therefore integration
+> failed."
+
+Instead ask:
+
+-   Was partial delivery expected?
+-   Was the remaining quantity cancelled/backordered?
+-   Are multiple ASNs expected?
+-   Is the invoice consistent with received quantity?
+-   What do the configured business rules allow?
+
+------------------------------------------------------------------------
+
+# 42. Scenario 38 --- Retry or Do Not Retry?
+
+This is one of the most important support questions.
+
+### Retry may be appropriate when
+
+-   Root cause is fixed
+-   Transaction definitely failed
+-   No downstream document was created
+-   Reprocessing is supported
+-   Duplicate risk is understood
+
+### Do not retry blindly when
+
+-   Request timed out
+-   Backend state is unknown
+-   Document may already exist
+-   Invoice/payment impact exists
+-   Duplicate transaction is possible
+
+### Decision model
+
+``` text
+Did transaction fail?
+        ↓
+Do we know downstream state?
+        ↓
+        NO
+        ↓
+Investigate before retry
+
+        YES
+        ↓
+Was business document created?
+   ┌────┴────┐
+  YES       NO
+   ↓         ↓
+Don't      Safe retry
+duplicate  if supported
+```
+
+------------------------------------------------------------------------
+
+# 43. Scenario 39 --- Technical Success but Business Failure
+
+### Example
+
+``` text
+HTTP 200
+ ↓
+Message accepted
+```
+
+But:
+
+``` text
+ERP document not created
+```
+
+### Interpretation
+
+Technical transport success does not necessarily mean business success.
+
+Investigate:
+
+-   response semantics
+-   asynchronous processing
+-   backend status
+-   application logs
+-   business document creation
+
+### Interview answer
+
+> "I distinguish transport-level success from business-level success. A
+> successful HTTP response or message handoff does not always prove that
+> the ERP business document was created."
+
+------------------------------------------------------------------------
+
+# 44. Scenario 40 --- Business Success but Status Update Missing
+
+### Example
+
+``` text
+ERP document exists
+ ↓
+Business processing = SUCCESS
+
+Upstream status
+ ↓
+Missing
+```
+
+### Investigation
+
+The business transaction may already be successful.
+
+Focus on:
+
+``` text
+Outbound status/update
+ ↓
+Integration
+ ↓
+Network
+ ↓
+Ariba update
+```
+
+### Important
+
+Do not recreate the business document merely because the status update
+is missing.
+
+------------------------------------------------------------------------
+
+# 45. Scenario 41 --- Same Error After Reprocessing
+
+### Symptom
+
+Support fixes nothing and repeatedly retries.
+
+``` text
+Failure
+ ↓
+Retry
+ ↓
+Same failure
+ ↓
+Retry
+ ↓
+Same failure
+```
+
+### Problem
+
+The root cause was never corrected.
+
+### Better process
+
+``` text
+Failure
+ ↓
+Evidence
+ ↓
+Root Cause
+ ↓
+Correction
+ ↓
+Controlled Retry
+ ↓
+Validation
+```
+
+------------------------------------------------------------------------
+
+# 46. Scenario 42 --- Integration Failure After a Change
+
+### Symptom
+
+Integration worked yesterday and failed after a deployment/configuration
+change.
+
+### Investigation
+
+``` text
+When did failure start?
+ ↓
+What changed?
+ ↓
+Which component changed?
+ ↓
+Did all transactions fail?
+ ↓
+Only one document type?
+ ↓
+Only one environment?
+```
+
+### Compare
+
+-   Configuration
+-   Mapping
+-   Certificates
+-   Endpoint
+-   Credentials
+-   Cloud Connector
+-   Backend changes
+-   Deployment
+-   Master data
+
+### Principle
+
+> Correlation with a change is evidence for investigation, not proof of
+> causation.
+
+------------------------------------------------------------------------
+
+# 47. Scenario 43 --- Only One Supplier Is Failing
+
+### Symptom
+
+99 suppliers work. One supplier fails.
+
+### Investigation
+
+Focus on supplier-specific differences:
+
+-   Supplier account
+-   Trading relationship
+-   Routing
+-   Supplier master data
+-   Supplier endpoint
+-   Supplier connectivity
+-   Supplier-specific mapping
+-   Supplier-specific document configuration
+
+### Reasoning
+
+If the same flow works for many suppliers, the scope helps narrow the
+investigation.
+
+It does not prove the cause.
+
+------------------------------------------------------------------------
+
+# 48. Scenario 44 --- All Suppliers Are Failing
+
+### Symptom
+
+Multiple suppliers suddenly stop receiving transactions.
+
+### Investigation scope
+
+``` text
+Supplier-specific?
+       ↓
+No
+       ↓
+Shared component
+       ↓
+Gateway / endpoint / certificate /
+connectivity / common configuration
+```
+
+Check:
+
+-   Shared endpoint
+-   Certificate
+-   authentication
+-   gateway
+-   network
+-   Cloud Connector where applicable
+-   common configuration
+-   recent change
+
+### Priority
+
+Because the blast radius is large, establish business impact and
+incident priority quickly.
+
+------------------------------------------------------------------------
+
+# 49. Scenario 45 --- One Environment Works, Another Fails
+
+### Example
+
+``` text
+QA   → SUCCESS
+PROD → FAILURE
+```
+
+### Investigation
+
+Compare:
+
+-   endpoints
+-   credentials
+-   certificates
+-   Cloud Connector mapping
+-   access control
+-   master data
+-   configuration
+-   supplier relationships
+-   integration settings
+
+### Key principle
+
+Never assume production is identical to QA.
+
+------------------------------------------------------------------------
+
+# 50. Scenario 46 --- Payload Looks Correct but Backend Rejects It
+
+### Investigation
+
+A payload can look correct to a human and still violate backend rules.
+
+Check:
+
+-   mandatory fields
+-   code values
+-   master data
+-   dates
+-   units
+-   currencies
+-   organizational values
+-   business rules
+-   configuration
+
+### Example
+
+``` text
+Plant = 1001
+```
+
+The value may be syntactically correct but invalid for:
+
+``` text
+Company Code = 2000
+```
+
+The backend context matters.
+
+------------------------------------------------------------------------
+
+# 51. Scenario 47 --- Wrong Currency
+
+### Symptom
+
+Invoice or transaction fails because currency is unexpected.
+
+### Investigation
+
+``` text
+PO currency
+Invoice currency
+Supplier data
+Contract
+Mapping
+ERP configuration
+```
+
+### Possible root causes
+
+-   Supplier submitted wrong currency
+-   Mapping issue
+-   Missing currency conversion/business rule
+-   PO/invoice mismatch
+-   ERP configuration
+
+------------------------------------------------------------------------
+
+# 52. Scenario 48 --- Unit of Measure Mismatch
+
+### Symptom
+
+Transaction fails or quantity behaves unexpectedly.
+
+### Investigation
+
+-   Source UOM
+-   Target UOM
+-   Conversion
+-   Material/UOM configuration
+-   Mapping
+-   Supplier document
+
+### Example
+
+``` text
+Source = EA
+Target = PC
+```
+
+Even apparently equivalent units must be validated against the actual
+configuration and business process.
+
+------------------------------------------------------------------------
+
+# 53. Scenario 49 --- Master Data Suddenly Causes Failures
+
+### Symptom
+
+Previously working transactions begin failing after master-data changes.
+
+### Investigation
+
+Compare:
+
+``` text
+Before change
+vs.
+After change
+```
+
+Check:
+
+-   Supplier
+-   Material
+-   Plant
+-   Company code
+-   Purchasing organization
+-   Purchasing group
+-   Cost center
+-   GL account
+-   Currency
+-   UOM
+-   payment/tax data where applicable
+
+### Root cause
+
+Master-data changes can create downstream failures even when integration
+configuration has not changed.
+
+------------------------------------------------------------------------
+
+# 54. Scenario 50 --- Production Incident With Multiple Failures
+
+### Symptom
+
+Several transaction types fail simultaneously.
+
+### Example
+
+``` text
+POs failing
+Invoices failing
+Master data failing
+```
+
+### Do not troubleshoot each transaction independently first.
+
+Look for a shared dependency:
+
+``` text
+Common endpoint
+Common authentication
+Common certificate
+Common gateway
+Common Cloud Connector
+Common ERP interface
+Common deployment
+Common network path
+```
+
+### Incident approach
+
+``` text
+Assess blast radius
+ ↓
+Identify common dependency
+ ↓
+Collect representative failures
+ ↓
+Find shared failure layer
+ ↓
+Contain impact
+ ↓
+Resolve
+ ↓
+Validate multiple transaction types
+ ↓
+RCA
+```
+
+------------------------------------------------------------------------
+
+# 55. HTTP Error Decision Tree
+
+``` text
+Request Failed
+      ↓
+What HTTP status?
+      │
+      ├── 401
+      │    ↓
+      │ Authentication
+      │    ↓
+      │ Gateway / endpoint logs
+      │    ↓
+      │ Credentials / token / auth method
+      │
+      ├── 403
+      │    ↓
+      │ Authorization
+      │    ↓
+      │ Cloud Connector / access controls
+      │    ↓
+      │ Permissions / resource access
+      │
+      ├── 404
+      │    ↓
+      │ Endpoint / Resource
+      │    ↓
+      │ URL / mapping / path
+      │    ↓
+      │ Endpoint investigation
+      │
+      └── 500
+           ↓
+        Backend / Application
+           ↓
+        ERP logs
+           ↓
+        Business / interface investigation
+```
+
+> Always identify the component that generated the status before
+> assigning root cause.
+
+------------------------------------------------------------------------
+
+# 56. Support Tools --- What to Check
+
+  -----------------------------------------------------------------------
+  Problem                             Possible First Tool / Evidence
+  ----------------------------------- -----------------------------------
+  Application log                     SLG1
+
+  ABAP dump                           ST22
+
+  IDoc                                WE02 / WE05
+
+  IDoc reprocessing                   BD87
+
+  Partner profile                     WE20
+
+  Web service                         SRT_MONI
+
+  RFC-related issue                   SM59 / SM58
+
+  Background job                      SM37
+
+  System log                          SM21
+
+  Authorization                       SU53
+
+  OData/Gateway errors                `/IWFND/ERROR_LOG` where applicable
+
+  Cloud Connector                     Connector status, system mapping,
+                                      access control
+
+  Gateway/integration                 Transaction/message monitoring and
+                                      payload/error evidence
+
+  Business Network                    Document status, routing,
+                                      supplier/trading relationship
+
+  Ariba application                   Document status, approval,
+                                      master-data and transaction details
+  -----------------------------------------------------------------------
+
+> Tool availability and exact diagnostic paths depend on the customer's
+> SAP release and architecture.
+
+------------------------------------------------------------------------
+
+# 57. RCA Framework
+
+A good RCA should answer:
+
+### 1. What happened?
+
+Example:
+
+> Purchase orders were not reaching suppliers.
+
+### 2. What was the impact?
+
+Example:
+
+> 143 purchase orders were delayed across 27 suppliers.
+
+### 3. Where did the failure occur?
+
+Example:
+
+> Shared outbound endpoint authentication.
+
+### 4. What was the root cause?
+
+Example:
+
+> Credential used by the integration endpoint had expired.
+
+### 5. Why was it not detected earlier?
+
+Example:
+
+> Certificate/credential expiry monitoring was not configured.
+
+### 6. What was the immediate fix?
+
+Example:
+
+> Credential was renewed according to the approved security process.
+
+### 7. What happened to affected transactions?
+
+Example:
+
+> Failed transactions were identified and safely reprocessed after
+> verifying downstream state.
+
+### 8. What is the preventive action?
+
+Example:
+
+> Add expiry monitoring and ownership notification.
+
+------------------------------------------------------------------------
+
+# 58. Incident Severity Thinking
+
+Do not classify severity only by the error message.
+
+Consider:
+
+``` text
+Business Impact
++
+Number of Transactions
++
+Number of Suppliers
++
+Financial Impact
++
+Operational Impact
++
+Workaround Availability
+```
+
+For example:
+
+``` text
+One test transaction
+≠
+All production POs failing
+```
+
+The same technical error can have very different business impact.
+
+------------------------------------------------------------------------
+
+# 59. Safe Reprocessing Checklist
+
+Before reprocessing:
+
+``` text
+☐ Root cause identified
+☐ Root cause corrected
+☐ Original transaction status known
+☐ Downstream document existence checked
+☐ Duplicate risk evaluated
+☐ Business impact understood
+☐ Reprocessing method approved
+☐ Required evidence captured
+☐ Test/controlled validation available
+```
+
+After reprocessing:
+
+``` text
+☐ Message processed
+☐ Business document created/updated correctly
+☐ Correct supplier received document
+☐ No duplicate created
+☐ Downstream status updated
+☐ Business owner confirms result
+```
+
+------------------------------------------------------------------------
+
+# 60. Interview Answer Framework
+
+For any scenario question, answer using:
+
+``` text
+1. Clarify the symptom
+2. Identify the document
+3. Determine direction
+4. Trace the transaction
+5. Identify the first failed layer
+6. Read the exact error
+7. Check payload/data
+8. Check master data/configuration
+9. Fix root cause
+10. Reprocess safely
+11. Validate business result
+12. Document RCA
+```
+
+### Example
+
+**Interviewer:**
+
+> "A PO is not reaching the supplier. What will you do?"
+
+**Strong answer:**
+
+> "First I would identify the PO and understand whether it was
+> successfully created and approved. Then I would trace its outbound
+> processing into the Business Network and verify the supplier account
+> and trading relationship. If the transaction reached the integration
+> layer, I would inspect the exact status and payload and determine the
+> first failed handoff. If it reached the supplier side successfully, I
+> would investigate supplier-side visibility or processing. I would not
+> blindly resend the PO because I first need to establish whether the
+> original transaction already exists downstream."
+
+------------------------------------------------------------------------
+
+# 61. Rapid-Fire Support Questions
+
+### Q1. Does 401 automatically mean Cloud Connector is down?
+
+**No.** First identify which component returned the 401. It is generally
+an authentication-related response.
+
+### Q2. Does 403 automatically mean the backend is down?
+
+**No.** Investigate authorization and access controls first.
+
+### Q3. Does 404 automatically mean the server is unavailable?
+
+**No.** Investigate the requested resource, URL, path, endpoint, and
+mapping.
+
+### Q4. Does 500 automatically mean CIG/Managed Gateway is down?
+
+**No.** Identify the component generating the 500 and investigate the
+server/application logs.
+
+### Q5. Does a green Cloud Connector status mean the transaction will succeed?
+
+**No.** Connectivity, resource access, authentication, authorization,
+endpoint processing, and business validation are separate concerns.
+
+### Q6. Does HTTP 200 prove the ERP business document was created?
+
+**Not necessarily.** Confirm the actual business result.
+
+### Q7. Should every failed transaction be retried?
+
+**No.** Determine root cause and downstream state first.
+
+### Q8. Is every ERP error an integration error?
+
+**No.** It may be master-data, configuration, or business validation.
+
+### Q9. Is every supplier-side problem a Business Network problem?
+
+**No.** Investigate supplier account, routing, trading relationship,
+supplier integration, and business processing.
+
+### Q10. Is valid XML enough?
+
+**No.** Technical validity does not guarantee business validity.
+
+------------------------------------------------------------------------
+
+# 62. 10 Golden Rules of Production Support
+
+## Rule 1 --- Follow the transaction
+
+Do not investigate components randomly.
+
+## Rule 2 --- Find the first failure
+
+The last visible error may only be a downstream symptom.
+
+## Rule 3 --- Read the exact error
+
+Do not replace evidence with assumptions.
+
+## Rule 4 --- Identify the error source
+
+A 500 from the backend is different from a 500 generated elsewhere.
+
+## Rule 5 --- Separate technical from business success
+
+Message delivery is not always business completion.
+
+## Rule 6 --- Check master data
+
+Many integration failures are caused by incorrect or missing business
+data.
+
+## Rule 7 --- Never blindly retry
+
+Especially after timeouts or unknown downstream state.
+
+## Rule 8 --- Protect against duplicates
+
+Invoices, POs, confirmations, and other business documents can have
+financial or operational consequences.
+
+## Rule 9 --- Validate the business result
+
+A green technical status is not the final acceptance criterion.
+
+## Rule 10 --- Document the RCA
+
+A resolved incident without a useful RCA can repeat.
+
+------------------------------------------------------------------------
+
+# 63. Final Production-Support Mental Model
+
+When an incident arrives, think:
+
+``` text
+WHAT happened?
+      ↓
+WHICH document?
+      ↓
+WHICH direction?
+      ↓
+WHERE was it last successful?
+      ↓
+WHERE did it first fail?
+      ↓
+WHAT exact error?
+      ↓
+WHO generated the error?
+      ↓
+WHAT evidence proves the cause?
+      ↓
+WHAT must be fixed?
+      ↓
+IS retry safe?
+      ↓
+DID the business result succeed?
+      ↓
+HOW do we prevent recurrence?
+```
+
+The objective is not:
+
+> "Make the error disappear."
+
+The objective is:
+
+> **Restore the business process safely, prove the transaction is
+> correct, and prevent the same failure from recurring.**
+
+------------------------------------------------------------------------
+
+# 64. Repository Position
+
+This document complements the other guides:
+
+``` text
+01 Architecture
+      ↓
+02 S2C
+      ↓
+03 P2O
+      ↓
+04 Business Network
+      ↓
+05 PnI / Integration
+      ↓
+06 ECC T-Codes
+      ↓
+07 SAP MM
+      ↓
+08 Interview Questions
+      ↓
+09 Production Support Scenarios
+```
+
+The first eight guides explain the ecosystem, processes, integration,
+ERP, and interview concepts.
+
+**This guide applies those concepts to real incident investigation.**
+
+------------------------------------------------------------------------
+
+# Quick Revision
+
+``` text
+401 → Authentication
+      → Gateway / endpoint logs
+      → Credentials / token / authentication method
+
+403 → Authorization
+      → Cloud Connector / access controls
+      → Permissions / resource access
+
+404 → Endpoint / Resource
+      → URL / mapping / path
+      → Endpoint investigation
+
+500 → Backend / Application
+      → ERP logs
+      → Business / interface investigation
+
+Cloud Connector GREEN
+      ≠
+Transaction SUCCESS
+
+HTTP SUCCESS
+      ≠
+Business SUCCESS
+
+Valid XML
+      ≠
+Valid Business Transaction
+
+Visible Error
+      ≠
+Root Cause
+
+Retry
+      ≠
+Resolution
+```
+
+------------------------------------------------------------------------
+
+# Final Checklist
+
+Before closing a production incident:
+
+``` text
+☐ Business impact assessed
+☐ Document identified
+☐ Transaction ID captured
+☐ Direction established
+☐ First failure identified
+☐ Exact error captured
+☐ Error source identified
+☐ Payload inspected where appropriate
+☐ Master data checked
+☐ Configuration checked
+☐ Root cause established
+☐ Fix implemented
+☐ Reprocessing risk evaluated
+☐ Transaction safely reprocessed if required
+☐ Business result validated
+☐ Duplicate risk ruled out
+☐ RCA documented
+☐ Preventive action identified
+```
+
+------------------------------------------------------------------------
+
+## Core Principle
+
+> **Trace the transaction. Isolate the failing layer. Prove the root
+> cause. Fix it safely. Validate the business result. Prevent
+> recurrence.**
