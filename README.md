@@ -88,7 +88,7 @@ If you are new to SAP Ariba, follow this order:
 | 🔌 05 | [PnI — Integration](./05-PnI-Integration.md) | Managed Gateway / CIG, Cloud Connector, cXML/XML, APIs, payloads, ECC, monitoring, errors, and troubleshooting | Integration / Technical / Support |
 | 🛠️ 06 | [ECC T-Codes](./06-ECC-TCodes.md) | ECC/S/4HANA transaction codes for logs, IDocs, web services, jobs, errors, and troubleshooting | Integration / Production Support |
 | 🏭 07 | [SAP MM](./07-SAP-MM.md) | SAP MM fundamentals, organizational structure, procurement, inventory, goods movement, invoice verification, T-Codes, troubleshooting, and Ariba/MM integration | Ariba / P2P / ERP |
-| 🎯 08 | [SAP Ariba Interview Questions](./08-SAP-Ariba-100-Interview-Questions-Answers.md) | 100 conceptual, functional, technical, integration, support, consulting, and scenario-based questions | Interview Preparation |
+| 🎯 08 | [SAP Ariba Interview Questions](./08-SAP-Ariba-Interview-Questions-Answers.md) | conceptual, functional, technical, integration, support, consulting, and scenario-based questions | Interview Preparation |
 | 📄 | [License](./LICENSE) | Repository licensing | Reuse / Contribution |
 
 ---
@@ -1056,7 +1056,7 @@ SAP-Ariba-Complete-Guide/
 ├── 05-PnI-Integration.md
 ├── 06-ECC-TCodes.md
 ├── 07-SAP-MM.md
-├── 08-SAP-Ariba-100-Interview-Questions-Answers.md
+├── 08-SAP-Ariba-Interview-Questions-Answers.md
 │
 └── LICENSE
 ```
