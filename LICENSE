@@ -2,64 +2,120 @@
 
 Copyright © 2026 Prateek Satpathi.
 
-This repository and its original content are licensed under the
-[Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+## Creative Commons Attribution 4.0 International
 
-You are free to:
+This repository, including the original educational content created for it, is licensed under the:
 
-* Share — copy and redistribute the material in any medium or format.
-* Adapt — remix, transform, and build upon the material.
+**Creative Commons Attribution 4.0 International License (CC BY 4.0)**
 
-These freedoms are subject to the terms of the CC BY 4.0 license, including
-appropriate attribution to the original author and indication of changes.
+https://creativecommons.org/licenses/by/4.0/
 
-## Scope
+Under this license, you are free to:
 
-This license applies only to original content created by the repository author
-and included in this repository.
+* **Share** — copy and redistribute the material in any medium or format.
+* **Adapt** — remix, transform, and build upon the material for any purpose, including commercial purposes.
 
-Third-party trademarks, product names, logos, documentation, screenshots,
-examples, excerpts, and other copyrighted materials remain the property of
-their respective owners and are not relicensed by this repository.
-
-Where third-party material is referenced or linked, users are responsible for
-respecting the applicable copyright, trademark, licensing, and usage terms.
-
-## Accuracy and Educational Disclaimer
-
-This repository is an independent educational and reference project.
-
-It is not official SAP documentation, is not affiliated with SAP SE, and does
-not represent or speak on behalf of SAP or any other third party.
-
-The material is provided for educational and informational purposes. While
-reasonable effort is made to keep the information accurate and current, no
-warranty is made that every statement, configuration, procedure, example, or
-troubleshooting recommendation is complete, current, or applicable to every
-SAP Ariba, SAP Business Network, SAP ECC, or SAP S/4HANA environment.
-
-Always validate technical procedures and configuration decisions against the
-applicable official documentation, system configuration, and organizational
-standards before using them in a production environment.
-
-## Trademarks
-
-SAP, SAP Ariba, SAP Business Network, SAP S/4HANA, SAP ECC, and other SAP
-product names and trademarks are the property of SAP SE or their respective
-owners.
-
-All other product names, trademarks, and service marks belong to their
-respective owners.
+These permissions are subject to the terms and conditions of the CC BY 4.0 license, including the requirement to provide appropriate attribution and indicate if changes were made.
 
 ## Attribution
 
-When redistributing or adapting substantial portions of the original material,
-please provide attribution to:
+When sharing, reproducing, adapting, or redistributing substantial portions of the original content in this repository, please provide appropriate attribution to:
 
 **Prateek Satpathi — SAP Ariba Complete Guide**
 
 Repository:
+
 https://github.com/Ram-2200/SAP-Ariba-Complete-Guide
 
 License:
+
 https://creativecommons.org/licenses/by/4.0/
+
+If material from this repository is modified, translated, adapted, or incorporated into another work, the reuse should clearly indicate that changes were made.
+
+## Scope of This License
+
+This license applies only to original content created by the repository author and included in this repository.
+
+Original content may include, where applicable:
+
+* Original explanations and educational material
+* Original documentation and written guides
+* Original diagrams and illustrations
+* Original examples and learning exercises
+* Original troubleshooting frameworks
+* Original interview questions and answers
+* Original production-support scenarios
+* Original repository structure and organization
+
+This license does **not** transfer ownership of third-party material.
+
+## Third-Party Material
+
+This repository may reference, describe, link to, or otherwise discuss third-party products, technologies, documentation, trademarks, screenshots, examples, terminology, and other materials.
+
+Third-party materials remain the property of their respective owners and are subject to their applicable copyrights, licenses, trademarks, and terms of use.
+
+Where third-party material is included or referenced, this repository does not claim ownership of that material and does not grant additional rights to it.
+
+Users are responsible for complying with the applicable rights and licensing requirements associated with third-party material.
+
+## SAP Disclaimer
+
+This is an independent educational and reference project.
+
+This repository is **not official SAP documentation** and is not affiliated with, sponsored by, endorsed by, or otherwise officially associated with SAP SE.
+
+SAP, SAP Ariba, SAP Business Network, SAP S/4HANA, SAP ECC, and other SAP product names, trademarks, and related intellectual property are the property of SAP SE or their respective owners.
+
+References to SAP products, technologies, terminology, documentation, or functionality are provided for educational and informational purposes.
+
+## Accuracy and Educational Disclaimer
+
+Reasonable effort is made to provide accurate, useful, and practical information.
+
+However, this repository is provided as an independent educational and reference resource. No guarantee is made that every statement, configuration concept, procedure, example, troubleshooting recommendation, product capability, or technical detail is complete, current, or applicable to every SAP Ariba, SAP Business Network, SAP ECC, SAP S/4HANA, or customer environment.
+
+SAP products and integration architectures may vary by:
+
+* Product version
+* Release
+* System landscape
+* Configuration
+* Integration architecture
+* Customer-specific customizations
+* Security policies
+* Implementation approach
+* Supported SAP capabilities
+
+Always validate technical procedures, configuration changes, integration decisions, and production actions against the applicable official documentation, system configuration, organizational standards, and change-management procedures before implementation.
+
+This repository should not be treated as a substitute for official product documentation, professional consulting advice, or environment-specific technical validation.
+
+## No Warranty
+
+The original content in this repository is provided for educational and informational purposes and is made available under the applicable terms of the CC BY 4.0 license.
+
+To the extent permitted by applicable law, the repository author makes no warranties regarding the accuracy, completeness, reliability, availability, or suitability of the material for any particular purpose.
+
+The repository author shall not be responsible for losses, damages, production incidents, configuration issues, or other consequences arising from reliance on the material without appropriate validation.
+
+## Trademarks
+
+All trademarks, service marks, product names, company names, and logos referenced in this repository belong to their respective owners.
+
+Use of such names or marks does not imply endorsement, sponsorship, affiliation, or partnership.
+
+## Independent Work
+
+Unless explicitly stated otherwise, the original educational material contained in this repository was created by **Prateek Satpathi**.
+
+This repository is intended to document and share independent learning, explanations, practical reasoning, troubleshooting approaches, and reference material related to SAP Ariba and connected enterprise procurement technologies.
+
+## License Notice
+
+Nothing in this notice removes or limits rights that cannot legally be limited under applicable law.
+
+For the complete legal terms governing the licensed original content, refer to the official CC BY 4.0 license:
+
+https://creativecommons.org/licenses/by/4.0/legalcode
