@@ -8,7 +8,7 @@
 
 ---
 
-## 📌 What This Repository Is
+# 📌 What This Repository Is
 
 This repository is being built as a **single practical reference point for SAP Ariba** rather than a collection of disconnected notes.
 
@@ -47,7 +47,7 @@ Interview Preparation
 
 The goal is **not** to claim that one repository can document every SAP Ariba feature or every customer configuration. SAP capabilities, terminology, releases, integrations, and configuration can change.
 
-The goal is to build a **structured, practical and continuously expandable reference** covering the concepts, flows, technical layers, examples, troubleshooting patterns, implementation knowledge, and interview preparation that matter most.
+The goal is to build a **structured, practical and continuously expandable reference** covering the concepts, flows, technical layers, examples, troubleshooting patterns, implementation knowledge, production-support reasoning, and interview preparation that matter most.
 
 ---
 
@@ -58,7 +58,7 @@ If you are new to SAP Ariba, follow this order:
 ```text
 1. Understand the ecosystem
           ↓
-2. Understand the architecture
+2. Learn the architecture
           ↓
 3. Learn S2C
           ↓
@@ -72,12 +72,16 @@ If you are new to SAP Ariba, follow this order:
           ↓
 8. Practice transaction flows
           ↓
-9. Study troubleshooting
+9. Learn production troubleshooting
           ↓
-10. Prepare for interviews
+10. Practice real support scenarios
+          ↓
+11. Prepare for interviews
 ```
 
-## Core Guides
+---
+
+# 📚 Core Guides
 
 | # | Guide | Focus | Best For |
 |---|---|---|---|
@@ -88,8 +92,8 @@ If you are new to SAP Ariba, follow this order:
 | 🔌 05 | [PnI — Integration](./05-PnI-Integration.md) | Managed Gateway / CIG, Cloud Connector, cXML/XML, APIs, payloads, ECC, monitoring, errors, and troubleshooting | Integration / Technical / Support |
 | 🛠️ 06 | [ECC T-Codes](./06-ECC-TCodes.md) | ECC/S/4HANA transaction codes for logs, IDocs, web services, jobs, errors, and troubleshooting | Integration / Production Support |
 | 🏭 07 | [SAP MM](./07-SAP-MM.md) | SAP MM fundamentals, organizational structure, procurement, inventory, goods movement, invoice verification, T-Codes, troubleshooting, and Ariba/MM integration | Ariba / P2P / ERP |
-| 🎯 08 | [SAP Ariba Interview Questions](./08-SAP-Ariba-Interview-Questions-Answers.md) | conceptual, functional, technical, integration, support, consulting, and scenario-based questions | Interview Preparation |
-| 📄 | [License](./LICENSE) | Repository licensing | Reuse / Contribution |
+| 🎯 08 | [SAP Ariba Interview Questions](./08-SAP-Ariba-Interview-Questions-Answers.md) | Conceptual, functional, technical, integration, support, consulting, and scenario-based questions | Interview Preparation |
+| 🚨 09 | [Production Support Scenarios](./09-Production-Support-Scenarios.md) | 50 practical production incidents, HTTP errors, Cloud Connector issues, ERP failures, RCA, safe reprocessing, and support decision-making | Production Support / Integration / Interview |
 
 ---
 
@@ -100,30 +104,30 @@ A useful way to understand the ecosystem is to separate the major Ariba areas fr
 ```text
                          SAP ARIBA ECOSYSTEM
                                   │
-             ┌────────────────────┼────────────────────┐
-             │                    │                    │
-             ▼                    ▼                    ▼
-            S2C                  P2O                  PnI
-     Source-to-Contract   Procure-to-Order    Platform & Integration
-             │                    │                    │
-             └────────────────────┼────────────────────┘
+              ┌───────────────────┼───────────────────┐
+              │                   │                   │
+              ▼                   ▼                   ▼
+             S2C                 P2O                 PnI
+      Source-to-Contract   Procure-to-Order   Platform & Integration
+              │                   │                   │
+              └───────────────────┼───────────────────┘
                                   │
                                   ▼
-                       SAP BUSINESS NETWORK
+                         SAP BUSINESS NETWORK
                                   │
                                   ▼
                               SUPPLIERS
                                   │
                                   ▼
-                         SAP ECC / S/4HANA
+                           SAP ECC / S/4HANA
                                   │
                      ┌────────────┴────────────┐
                      │                         │
                    SAP MM                    SAP FI
                      │                         │
-            Procurement / Inventory       Accounting
-            Goods Movement
-            Invoice Verification
+             Procurement / Inventory       Accounting
+             Goods Movement
+             Invoice Verification
 ```
 
 > **Important:** SAP MM is an ERP-side functional area within SAP ERP / SAP S/4HANA. It is not a separate system underneath ECC or S/4HANA.
@@ -184,7 +188,7 @@ Major areas include:
 - Invoice reconciliation
 - Exceptions
 
-### P2O vs P2P
+## P2O vs P2P
 
 In this repository:
 
@@ -262,46 +266,46 @@ See: [04 — Business Network](./04-Business-Network.md)
 A simplified end-to-end procurement model:
 
 ```text
-                     BUSINESS NEED
-                           │
-                           ▼
+                    BUSINESS NEED
+                         │
+                         ▼
                   PURCHASE REQUISITION
-                           │
-                           ▼
-                    APPROVAL / POLICY
-                           │
-                           ▼
-                     PURCHASE ORDER
-                           │
-                           ▼
+                         │
+                         ▼
+                   APPROVAL / POLICY
+                         │
+                         ▼
+                    PURCHASE ORDER
+                         │
+                         ▼
                   SAP BUSINESS NETWORK
+                         │
+                         ▼
+                       SUPPLIER
+                      ┌────┴────┐
+                      │         │
+                      ▼         ▼
+                CONFIRMATION   ASN
+                      │         │
+                      └────┬────┘
+                           ▼
+                      GOODS RECEIPT
                            │
                            ▼
-                        SUPPLIER
-                       ┌────┴────┐
-                       │         │
-                       ▼         ▼
-                 CONFIRMATION   ASN
-                       │         │
-                       └────┬────┘
-                            ▼
-                      GOODS RECEIPT
-                            │
-                            ▼
                          INVOICE
-                            │
-                            ▼
-                   INVOICE RECONCILIATION
-                       ┌────┴────┐
-                       │         │
-                     PASS    EXCEPTION
-                       │         │
-                       │         ▼
-                       │      RESOLUTION
-                       │         │
-                       └────┬────┘
-                            ▼
-                      PAYMENT PROCESS
+                           │
+                           ▼
+                  INVOICE RECONCILIATION
+                     ┌─────┴─────┐
+                     │           │
+                    PASS      EXCEPTION
+                     │           │
+                     │           ▼
+                     │       RESOLUTION
+                     │           │
+                     └─────┬─────┘
+                           ▼
+                     PAYMENT PROCESS
 ```
 
 > Not every business process uses every document. Service procurement and customer-specific processes can follow different paths.
@@ -314,24 +318,26 @@ A procurement transaction does not stop when the buyer creates a PO.
 
 ```text
 BUYER
+  │
+  ▼
 SAP Ariba / ERP
-      │
-      │ PO
-      ▼
+  │
+  │ PO
+  ▼
 SAP BUSINESS NETWORK
-      │
-      │ Routing / Collaboration
-      ▼
+  │
+  │ Routing / Collaboration
+  ▼
 SUPPLIER
-      │
-      ├── Confirmation
-      ├── ASN
-      └── Invoice
-      │
-      ▼
+  │
+  ├── Confirmation
+  ├── ASN
+  └── Invoice
+  │
+  ▼
 SAP BUSINESS NETWORK
-      │
-      ▼
+  │
+  ▼
 BUYER
 ```
 
@@ -563,7 +569,7 @@ Payment
 | Where is invoice verification performed? | SAP MM / ERP |
 | Why did the transaction fail? | Troubleshooting |
 | How do we implement the solution? | Implementation |
-| How do we support it in production? | Support |
+| How do we support it in production? | Production Support |
 | How do I prepare for an interview? | Interview Preparation |
 
 ---
@@ -770,141 +776,202 @@ Business Configuration
 
 ---
 
-# 🧪 Support Scenario: PO Failure Analysis
+# 🚨 HTTP Error Quick Reference
 
-### Business statement
+These are **first-pass troubleshooting classifications**, not absolute root-cause rules. Always identify which component returned the status and inspect the accompanying response/logs.
 
-> "The supplier did not receive PO 4500001234."
-
-Do not immediately say:
-
-> "CIG is down."
-
-Trace the transaction:
+| HTTP | Classification | First Investigation | Typical Evidence |
+|---|---|---|---|
+| **401** | Authentication | Gateway / endpoint authentication | Credentials, token, authentication response, endpoint logs |
+| **403** | Authorization | Cloud Connector access controls / endpoint permissions | Access control, resource exposure, authorization response |
+| **404** | Endpoint / Resource | URL, mapping, path | Request URL, virtual/internal host mapping, endpoint configuration |
+| **500** | Backend / Application | ERP/application | ERP logs, application errors, interface/business processing |
 
 ```text
-PO exists?
-   │
-   ├── NO → Investigate procurement process
-   │
-   └── YES
-        ↓
-PO approved?
-   │
-   ├── NO → Approval issue
-   │
-   └── YES
-        ↓
-PO sent?
-   │
-   ├── NO → Output/process issue
-   │
-   └── YES
-        ↓
-Network transaction?
-   │
-   ├── NO → Source/connectivity issue
-   │
-   └── YES
-        ↓
-Receiver correct?
-   │
-   ├── NO → Routing/master-data issue
-   │
-   └── YES
-        ↓
-Supplier relationship active?
-   │
-   ├── NO → Network configuration
-   │
-   └── YES
-        ↓
-Supplier received?
-   │
-   ├── NO → Supplier/network path
-   │
-   └── YES → Business visibility/action
+401
+ ↓
+Authentication
+ ↓
+Gateway / endpoint logs
+ ↓
+Credential / token investigation
 ```
 
-This is the type of reasoning the repository is intended to teach: **trace the transaction, isolate the failing layer, and distinguish the symptom from the root cause.**
+```text
+403
+ ↓
+Authorization
+ ↓
+Cloud Connector / access controls
+ ↓
+Permissions investigation
+```
+
+```text
+404
+ ↓
+Endpoint / Resource
+ ↓
+URL / mapping / path
+ ↓
+Endpoint investigation
+```
+
+```text
+500
+ ↓
+Backend / Application
+ ↓
+ERP logs
+ ↓
+Business / interface investigation
+```
+
+> **Do not diagnose the entire integration from an HTTP code alone. Identify the component that generated the response first.**
 
 ---
 
-# 🧪 Support Scenario: Invoice Reconciliation
+# 🧪 Production Support Scenarios
 
-Suppose:
+The repository now includes a dedicated runbook with **50 practical production-support scenarios**.
 
-```text
-PO quantity       = 100
-Confirmed         = 100
-ASN                = 100
-Received           = 90
-Invoice            = 100
-```
+See:
 
-Do not simply label this an "integration failure."
+**[09 — Production Support Scenarios](./09-Production-Support-Scenarios.md)**
 
-First classify:
+It covers scenarios including:
 
-```text
-PO        = 100
-Receipt   = 90
-Invoice   = 100
-```
-
-The business question is:
-
-> Why is the supplier billing 100 when only 90 were recorded as received?
-
-Possible investigation areas:
-
-- Short receipt
+- PO not reaching supplier
+- PO exists in Ariba but not ERP
+- Cloud Connector green but transaction fails
+- HTTP 401 / 403 / 404 / 500
+- Supplier cannot see PO
+- Missing confirmation
+- Missing ASN
+- GR/status propagation issues
+- Invoice quantity mismatch
+- Invoice price mismatch
+- Duplicate invoice
+- Timeout followed by duplicate
+- Invalid plant
+- Invalid material
+- Invalid supplier
+- Cost center rejection
+- Mapping/value-mapping failure
+- Valid XML but failed business transaction
+- Authentication vs authorization
+- Certificate expiry
+- Cloud Connector tunnel/resource problems
+- IDoc failure
+- Web-service failure
+- Background job failure
+- Application log errors
+- ABAP runtime errors
+- Wrong approver
+- PR stuck in approval
+- Catalog issues
+- Supplier onboarding
+- Wrong supplier account
+- PO change not reflected
 - Partial delivery
-- Receipt not posted
-- Supplier invoice error
-- Tolerance configuration
-- Business exception handling
-
-The exact reconciliation result depends on configured rules and the business process.
+- Retry vs do-not-retry decisions
+- Technical success vs business failure
+- Business success but missing status update
+- Repeated failure after reprocessing
+- Failure after a change
+- One supplier failing
+- All suppliers failing
+- Environment differences
+- Backend rejection despite apparently correct payload
+- Currency/UOM issues
+- Master-data-driven failures
+- Multi-component production incidents
 
 ---
 
-# 🔌 Support Scenario: Integration Failure
+# 🧠 Production Support Mental Model
 
-Suppose:
-
-```text
-Ariba
-  ↓ SUCCESS
-Gateway
-  ↓ SUCCESS
-Middleware
-  ↓ SUCCESS
-Cloud Connector
-  ↓ SUCCESS
-ECC
-  ↓ ERROR
-```
-
-ECC reports:
+When an incident arrives, think:
 
 ```text
-Plant 1001 is not valid
+WHAT happened?
+      ↓
+WHICH document?
+      ↓
+WHICH direction?
+      ↓
+WHERE was it last successful?
+      ↓
+WHERE did it first fail?
+      ↓
+WHAT exact error?
+      ↓
+WHO generated the error?
+      ↓
+WHAT evidence proves the cause?
+      ↓
+WHAT must be fixed?
+      ↓
+IS retry safe?
+      ↓
+DID the business result succeed?
+      ↓
+HOW do we prevent recurrence?
 ```
 
-Root-cause classification:
+The objective is not:
+
+> "Make the error disappear."
+
+The objective is:
+
+> **Restore the business process safely, prove the transaction is correct, and prevent the same failure from recurring.**
+
+---
+
+# 🧱 Production Support Decision Framework
+
+For difficult incidents:
 
 ```text
-Backend business / master-data / configuration
+Business Impact
+      ↓
+Document / Transaction
+      ↓
+Direction
+      ↓
+Last Successful Layer
+      ↓
+First Failed Layer
+      ↓
+Exact Error
+      ↓
+Error Source
+      ↓
+Payload / Data
+      ↓
+Master Data / Configuration
+      ↓
+Root Cause
+      ↓
+Resolution
+      ↓
+Safe Reprocessing
+      ↓
+Business Validation
+      ↓
+RCA / Prevention
 ```
 
-Not automatically:
+A strong support engineer distinguishes:
 
 ```text
-CIG failure
+Symptom
+   ≠
+Failure Point
+   ≠
+Root Cause
 ```
-
-This distinction is one of the most important integration and support concepts in the repository.
 
 ---
 
@@ -928,6 +995,8 @@ S2C
 PnI Basics
         ↓
 ECC / T-Codes
+        ↓
+Production Support Scenarios
         ↓
 Interview Questions
 ```
@@ -960,6 +1029,8 @@ Contracts
 Integration Concepts
  ↓
 Implementation
+ ↓
+Production Support
 ```
 
 ## 🔌 Integration / Support Engineer
@@ -991,6 +1062,8 @@ Monitoring
  ↓
 Troubleshooting
  ↓
+Production Support Scenarios
+ ↓
 RCA / Support
 ```
 
@@ -1018,6 +1091,8 @@ Testing
 Implementation
  ↓
 Support
+ ↓
+Production Scenarios
 ```
 
 ## 🎯 Interview Preparation
@@ -1036,6 +1111,8 @@ Integration
 Troubleshooting
  ↓
 Real-World Scenarios
+ ↓
+Production Support Scenarios
  ↓
 Interview Questions
 ```
@@ -1057,39 +1134,45 @@ SAP-Ariba-Complete-Guide/
 ├── 06-ECC-TCodes.md
 ├── 07-SAP-MM.md
 ├── 08-SAP-Ariba-Interview-Questions-Answers.md
+├── 09-Production-Support-Scenarios.md
 │
 └── LICENSE
 ```
 
-## How the Guides Connect
+---
+
+# 🔗 How the Guides Connect
 
 ```text
                                       README
-                                        │
-              ┌─────────────────────────┼─────────────────────────┐
-              │                         │                         │
-              ▼                         ▼                         ▼
-        Architecture                   S2C                       P2O
-              │                         │                         │
-              │                         └──────────┬──────────────┘
-              │                                    │
-              ▼                                    ▼
-             PnI                            Business Network
-              │                                    │
-              └──────────────────┬─────────────────┘
-                                 ▼
+                                         │
+             ┌───────────────────────────┼───────────────────────────┐
+             │                           │                           │
+             ▼                           ▼                           ▼
+       Architecture                     S2C                         P2O
+             │                           │                           │
+             │                           └──────────┬────────────────┘
+             │                                      │
+             ▼                                      ▼
+            PnI                              Business Network
+             │                                      │
+             └──────────────────┬───────────────────┘
+                                ▼
                           ECC / S/4HANA
-                                 │
-                    ┌────────────┴────────────┐
-                    │                         │
-                  SAP MM                    SAP FI
-                    │                         │
-                    └────────────┬────────────┘
-                                 ▼
-                          Troubleshooting
-                                 │
-                                 ▼
-                         Interview Preparation
+                                │
+                    ┌───────────┴───────────┐
+                    │                       │
+                  SAP MM                  SAP FI
+                    │                       │
+                    └───────────┬───────────┘
+                                ▼
+                       Troubleshooting
+                                │
+                                ▼
+                   Production Support Scenarios
+                                │
+                                ▼
+                     Interview Preparation
 ```
 
 ---
@@ -1158,6 +1241,7 @@ Be able to explain:
 - Proxy
 - Cloud Connector
 - Authentication
+- Authorization
 - Mapping
 - Transformation
 - Payload
@@ -1178,6 +1262,10 @@ Be able to reason through:
 - Certificate expiry
 - Duplicate transaction
 - Backend business rejection
+- Cloud Connector access issue
+- 401 / 403 / 404 / 500
+- Retry vs duplicate risk
+- Production RCA
 
 ---
 
@@ -1196,7 +1284,7 @@ IDENTIFY ROOT CAUSE
      ↓
 RESOLVE
      ↓
-REPROCESS
+REPROCESS SAFELY
      ↓
 VALIDATE
      ↓
@@ -1215,71 +1303,29 @@ Root Cause
 
 ---
 
-# 🧱 Future Roadmap
+# 🧪 Support Tools — Quick Reference
 
-The current numbered guides form the core documentation foundation.
+| Problem | Possible First Tool / Evidence |
+|---|---|
+| Application log | SLG1 |
+| ABAP dump | ST22 |
+| IDoc | WE02 / WE05 |
+| IDoc reprocessing | BD87 |
+| Partner profile | WE20 |
+| Web service | SRT_MONI |
+| RFC-related issue | SM59 / SM58 |
+| Background job | SM37 |
+| System log | SM21 |
+| Authorization | SU53 |
+| OData/Gateway errors | `/IWFND/ERROR_LOG` where applicable |
+| Cloud Connector | Connector status, system mapping, access control |
+| Gateway/integration | Transaction/message monitoring and payload/error evidence |
+| Business Network | Document status, routing, supplier/trading relationship |
+| Ariba application | Document status, approval, master-data and transaction details |
 
-Future repository expansion can include:
+> Tool availability and exact diagnostic paths depend on the customer's SAP release and architecture.
 
-- Architecture diagrams
-- Master-data reference sheets
-- Transaction-document matrix
-- cXML examples
-- Integration error library
-- Support runbooks
-- RCA templates
-- Implementation checklists
-- Test-case templates
-- Cutover checklist
-- Hypercare checklist
-- Scenario-based interview sets
-- Sample sanitized payloads
-
-These are **roadmap items**, not claims that these files already exist.
-
----
-
-# 🏗️ Documentation Standard
-
-New documents should preferably follow:
-
-```text
-# Topic
-
-## 1. Definition
-
-## 2. Business Purpose
-
-## 3. Where It Fits
-
-## 4. Architecture / Flow
-
-## 5. Functional Concepts
-
-## 6. Configuration / Design
-
-## 7. Master Data
-
-## 8. Integration
-
-## 9. Transaction / Document Flow
-
-## 10. Common Issues
-
-## 11. Troubleshooting
-
-## 12. Real-World Example
-
-## 13. Interview Questions
-
-## 14. Quick Revision
-
-## References
-```
-
-The objective is:
-
-> **Depth + usability, not simply document length.**
+See [06 — ECC T-Codes](./06-ECC-TCodes.md) for the dedicated reference.
 
 ---
 
@@ -1326,7 +1372,7 @@ Plant:
 
 Use official SAP documentation as a reference. Do not copy proprietary/internal SAP or customer material into the repository.
 
-SAP trademarks, product names, screenshots, and third-party materials remain subject to their respective owners' terms.
+SAP trademarks, product names, documentation, and third-party materials remain subject to their respective owners' terms.
 
 ---
 
@@ -1375,12 +1421,72 @@ The repository should prefer **official SAP sources** for product behavior, conf
 
 ---
 
-# 🔗 Repository
+# 🧱 Future Repository Expansion
 
-**GitHub:**  
-https://github.com/Ram-2200/SAP-Ariba-Complete-Guide
+The core documentation foundation now includes architecture, business processes, integration, ERP/MM, interview preparation, and production-support scenarios.
 
-If you find an error, outdated behavior, missing topic, or useful reference, improvements are welcome.
+Future expansion can focus on **high-value artifacts rather than simply adding more prose**:
+
+- Architecture diagrams
+- Master-data reference sheets
+- Transaction-document matrix
+- cXML examples
+- Integration error library
+- Detailed support runbooks
+- RCA templates
+- Implementation checklists
+- Test-case templates
+- Cutover checklist
+- Hypercare checklist
+- Scenario-based interview sets
+- Sample sanitized payloads
+- Troubleshooting decision trees
+
+These are expansion opportunities, not claims that every item already exists.
+
+---
+
+# 🏗️ Documentation Standard
+
+New documents should preferably follow:
+
+```text
+# Topic
+
+## 1. Definition
+
+## 2. Business Purpose
+
+## 3. Where It Fits
+
+## 4. Architecture / Flow
+
+## 5. Functional Concepts
+
+## 6. Configuration / Design
+
+## 7. Master Data
+
+## 8. Integration
+
+## 9. Transaction / Document Flow
+
+## 10. Common Issues
+
+## 11. Troubleshooting
+
+## 12. Real-World Example
+
+## 13. Interview Questions
+
+## 14. Quick Revision
+
+## References
+```
+
+The objective is:
+
+> **Depth + usability, not simply document length.**
 
 ---
 
@@ -1419,6 +1525,10 @@ What can fail?
         ↓
 How do I troubleshoot it?
         ↓
+How do I safely reprocess it?
+        ↓
+How do I validate the business result?
+        ↓
 How would I explain it in an interview?
 ```
 
@@ -1434,8 +1544,17 @@ SAP product names, trademarks, documentation, and third-party materials remain t
 
 ---
 
+# 🔗 Repository
+
+**GitHub:**  
+https://github.com/Ram-2200/SAP-Ariba-Complete-Guide
+
+If you find an error, outdated behavior, missing topic, or useful reference, improvements are welcome.
+
+---
+
 ## ⭐ If This Guide Helps You
 
 Star the repository, use the guides, improve the documentation, and share useful corrections or references with the community.
 
-**Built as a practical SAP Ariba learning and reference project.**
+**Built as a practical SAP Ariba learning, troubleshooting, and interview-reference project.**
